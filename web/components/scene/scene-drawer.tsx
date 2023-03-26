@@ -51,7 +51,7 @@ const SceneDrawer: React.FC<SceneDrawerProps> = ({
 
   return (
     <Drawer
-      title={scene ? "Modify Dataset" : "Create Dataset"}
+      title={scene ? "Modify Scene" : "Create Scene"}
       width={720}
       onClose={onClose}
       visible={visible}
