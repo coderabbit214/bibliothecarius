@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+  qdrant:
+    volumes:
+      - '$PWD/qdrant/data:/qdrant/storage'
+    ports:
+      - '6333:6333'
+    image: qdrant/qdrant
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - $PWD/mysql/init/:/docker-entrypoint-initdb.d/
+      - $PWD/mysql/data:/var/lib/mysql/
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"

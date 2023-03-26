@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Bibliothecarius</title>
+    <meta name="viewport"
+          content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1,target-densitydpi=device-dpi ">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.3/dist/full.css" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="container">
+    <div class="flex flex-col items-center h-screen w-screen">
+        <div class="flex flex-col items-center justify-center">
+            <h1 class="text-5xl font-bold mt-20">Bibliothecarius</h1>
+            <p class="text-xl my-10">
+                scene:
+                <select onchange="sceneSelect()" id="scene">
+                    <option th:each="scene : ${scenes}" th:value="${scene}" th:text="${scene}"></option>
+                </select>
+            </p>
+        </div>
+        <div class="flex flex-row items-center justify-center w-full">
+            <input id="search" type="text" placeholder="Please enter content"
+                   class="input input-bordered w-2/3 lg:w-2/5 mr-2"/>
+            <button class="btn btn-primary">submit</button>
+        </div>
+        <div class="flex flex-col justify-start mt-10 mx-5">
+            <div class="card bg-base-100 shadow-md">
+                <div class="card-body">
+                    <h2 class="card-title">AI answer</h2>
+                    <p class="text-lg" id="answer"></p>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">original</h2>
+                    <p class="text-lg" id="original"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let scene = "";
+    window.onload = function () {
+        scene = sen.options[0].value
+    }
+    const submitButton = document.querySelector('button');
+    const search = document.querySelector('#search');
+    const card = document.querySelector('.card');
+    const sen = document.querySelector('#scene');
+
+    function sceneSelect(){
+        const sen = document.querySelector('#scene');
+        scene = sen.options[sen.selectedIndex].value;
+    }
+    card.style.display = 'none';
+    submitButton.addEventListener('click', () => {
+        const data = {
+            context: search.value,
+        };
+        fetch('/scene/' + scene + '/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json()).then(data => {
+            card.style.display = 'block';
+            console.log(data)
+            document.querySelector('#answer').innerHTML = data.data.contents[0]
+            document.querySelector('#original').innerHTML = ""
+            data.data.jsonData.forEach(element => {
+                document.querySelector('#original').innerHTML += element.context
+                document.querySelector('#original').innerHTML += "<br/>"
+            })
+        });
+    });
+
+</script>
+</body>
+</html>

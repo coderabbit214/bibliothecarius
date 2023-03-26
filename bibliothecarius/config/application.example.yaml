@@ -1,0 +1,39 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 123456
+    url: jdbc:mysql://xxx:3306/ai_librarian?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root
+  mvc:
+    async:
+      request-timeout: 30000
+
+openai:
+  api-key: xxx
+
+qdrant:
+  host: http://xxx
+
+
+
+storage:
+  # 使用storage的模式
+  # 1. ALIYUN
+  # 2. MINIO
+  mode: ALIYUN
+  # 协议
+  protocol: http://
+  # 上传目录
+  dir: /
+  # 上传url过期时间 单位 s
+  updateExpiryTime: 3600
+  # 查看过期时间 单位 s
+  downloadExpiryTime: 3600
+  aliyun:
+    endpoint: xxx
+    keyid: xxx
+    keysecret: xxx
+    bucketName: xxx

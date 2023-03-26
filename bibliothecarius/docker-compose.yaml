@@ -1,0 +1,8 @@
+version: '3.3'
+services:
+  bibliothecarius:
+    build: .
+    volumes:
+      - '$PWD/config:/app/config'
+    ports:
+      - '8080:8080'

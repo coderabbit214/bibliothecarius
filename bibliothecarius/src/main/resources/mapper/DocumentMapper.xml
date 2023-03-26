@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coderabbit214.bibliothecarius.dataset.document.DocumentMapper">
+
+    <select id="pageByQuery" resultType="com.coderabbit214.bibliothecarius.dataset.document.Document">
+        select d.id,
+        d.dataset_id,
+        d.name,
+        d.hash_code,
+        d.state,
+        d.file_key,
+        d.size,
+        d.type,
+        d.create_time,
+        d.update_time
+        from document d
+        left join dataset on dataset.id = d.dataset_id
+        <where>
+            dataset.name = #{datasetName}
+            <if test="pageParam != null and pageParam.documentName != null and pageParam.documentName != ''">
+                and d.name like concat('%', #{pageParam.documentName}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="listByQuery" resultType="com.coderabbit214.bibliothecarius.dataset.document.Document">
+        select d.id,
+        d.dataset_id,
+        d.name,
+        d.hash_code,
+        d.state,
+        d.file_key,
+        d.size,
+        d.type,
+        d.create_time,
+        d.update_time
+        from document d
+        left join dataset on dataset.id = d.dataset_id
+        <where>
+            dataset.name = #{datasetName}
+            <if test="pageParam != null and pageParam.documentName != null and pageParam.documentName != '' ">
+                and d.name like concat('%', #{pageParam.documentName}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>
