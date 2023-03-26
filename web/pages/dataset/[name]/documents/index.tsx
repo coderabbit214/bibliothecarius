@@ -45,8 +45,15 @@ const DocumentPage = () => {
   };
 
   const handleReprocess = async (id: number) => {
-    await reprocessDocument(datasetName as string, id);
-    fetchDocuments();
+    reprocessDocument(datasetName as string, id).then(() =>
+      fetchDocuments()
+    ).catch((err) => {
+      if (err.message) {
+        message.error(err.message);
+      } else {
+        message.error('Failed to reprocess');
+      }
+    });
   };
 
   return (
