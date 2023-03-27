@@ -18,6 +18,7 @@ import {
 import SceneDrawer from "./scene-drawer";
 import Dataset from "@/models/dataset";
 import {getDatasets} from "@/services/dataset-service";
+import usePolling from "@/hooks/polling";
 
 const SceneTable: React.FC = () => {
   const [scenes, setScenes] = useState<Scene[]>([]);
@@ -39,6 +40,9 @@ const SceneTable: React.FC = () => {
     const result = await getDatasets();
     setDatasets(result);
   }
+
+  usePolling(fetchScenes, 5000);
+  usePolling(fetchDatasets, 5000);
 
   const handleDelete = async (id: number) => {
     try {

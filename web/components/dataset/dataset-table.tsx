@@ -17,6 +17,7 @@ import {
 } from "@/services/dataset-service";
 import DatasetDrawer from "./dataset-drawer";
 import {useRouter} from "next/router";
+import usePolling from "@/hooks/polling";
 
 const DatasetTable: React.FC = () => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
@@ -33,6 +34,8 @@ const DatasetTable: React.FC = () => {
     const result = await getDatasets();
     setDatasets(result);
   };
+
+  usePolling(fetchDatasets, 5000);
 
   const handleDocumentManagement = (dataset: Dataset) => {
     router.push(`/dataset/${dataset.name}/documents`);
