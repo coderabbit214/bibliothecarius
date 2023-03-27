@@ -23,7 +23,9 @@ Bibliothecarius is a local data analysis tool that can engage in conversation ba
 - [ ] Better UI
 - [ ] Support for more file types
   - [x] txt
-  - [ ] pdf
+  - [x] pdf
+  - [x] md
+  - [ ] docx
 - [ ] Support for more models
   - [x] gpt3.5
   - [ ] ChatGLM

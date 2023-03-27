@@ -21,7 +21,9 @@ Bibliothecarius是一个本地数据分析工具，可根据自定义prompt进�
 - [ ] 更好的UI
 - [ ] 支持更多文件类型
   - [x] txt
-  - [ ] pdf
+  - [x] pdf
+  - [x] md
+  - [ ] docx
 - [ ] 支持更多的模型
   - [x] gpt3.5
   - [ ] ChatGLM
