@@ -1,12 +1,12 @@
 package com.coderabbit214.bibliothecarius.dataset.document;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
 import com.coderabbit214.bibliothecarius.dataset.Dataset;
 import com.coderabbit214.bibliothecarius.dataset.DatasetService;
+import com.coderabbit214.bibliothecarius.dataset.aliparser.AliParserService;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
 import com.coderabbit214.bibliothecarius.qdrant.point.Point;
 import com.coderabbit214.bibliothecarius.qdrant.point.PointCreateRequest;
@@ -16,8 +16,8 @@ import com.coderabbit214.bibliothecarius.vector.VectorFactory;
 import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,9 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private static final String FILE_TYPE_MD = "md";
 
-    private static final List<String> SUPPORT_FILE_TYPE = List.of(FILE_TYPE_TXT, FILE_TYPE_MD);
+    private static final String FILE_TYPE_PDF = "pdf";
+
+    private static final List<String> SUPPORT_FILE_TYPE = List.of(FILE_TYPE_TXT, FILE_TYPE_MD, FILE_TYPE_PDF);
 
     private final StorageFactory storageFactory;
 
@@ -63,12 +65,15 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private final DocumentQdrantService documentQdrantService;
 
-    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory, DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService) {
+    private final AliParserService aliParserService;
+
+    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory, DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
         this.storageFactory = storageFactory;
         this.vectorFactory = vectorFactory;
         this.datasetService = datasetService;
         this.documentService = documentService;
         this.documentQdrantService = documentQdrantService;
+        this.aliParserService = aliParserService;
     }
 
     /**
@@ -132,7 +137,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             document.setState(DocumentStateEnum.PROCESSING.value());
             this.save(document);
             //向量化至qdrant
-            toQdrant(dataset.getName(), file.getInputStream(), vectorType, type, document, true);
+            toQdrant(dataset.getName(), file.getInputStream(), vectorType, type, document);
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("File read exception:", e);
@@ -149,19 +154,22 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
      * @param document
      * @throws IOException
      */
-    private void toQdrant(String datasetName, InputStream fileInputStream, String vectorType, String type, Document document, boolean init) throws IOException {
+    private void toQdrant(String datasetName, InputStream fileInputStream, String vectorType, String type, Document document) throws IOException {
         switch (type) {
             case FILE_TYPE_TXT:
-                List<DocumentQdrant> documentQdrants = null;
-                if (init) {
+                List<DocumentQdrant> documentQdrants = documentQdrantService.getByDocumentId(document.getId());
+                if (documentQdrants.size() == 0) {
                     documentQdrants = this.txtSplit(fileInputStream, document);
-                } else {
-                    documentQdrants = documentQdrantService.getByDocumentId(document.getId());
                 }
-                documentService.txtToQdrant(documentQdrants, document, vectorType, datasetName);
+                documentService.toVector(documentQdrants, document, vectorType, datasetName);
                 break;
             case FILE_TYPE_MD:
                 documentService.mdToQdrant(fileInputStream, document, vectorType, datasetName);
+                break;
+            case FILE_TYPE_PDF:
+                StorageInterface ossService = storageFactory.getOssService();
+                String fileUrl = ossService.getExpiration(document.getFileKey());
+                aliParserService.parse(document, document.getName(), fileUrl, datasetName, vectorType);
                 break;
             default:
                 throw new BusinessException("unsupported file type");
@@ -289,14 +297,13 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
     }
 
     /**
-     * txt文件转换为qdrant
+     * documentQdrants转化为vector
      *
      * @param documentQdrants
      * @param vectorType
      */
     @Async
-    public void txtToQdrant(List<DocumentQdrant> documentQdrants, Document document, String vectorType, String datasetName) {
-
+    public void toVector(List<DocumentQdrant> documentQdrants, Document document, String vectorType, String datasetName) {
         try {
             QdrantService qdrantService = new QdrantService();
             VectorInterface vectorService = vectorFactory.getVectorService(vectorType);
@@ -409,7 +416,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             URL url = new URL(fileUrl);
             URLConnection urlConnection = url.openConnection();
             InputStream inputStream = urlConnection.getInputStream();
-            toQdrant(dataset.getName(), inputStream, dataset.getVectorType(), document.getType(), document, false);
+            toQdrant(dataset.getName(), inputStream, dataset.getVectorType(), document.getType(), document);
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("File read exception:", e);
