@@ -1,6 +1,7 @@
 package com.coderabbit214.bibliothecarius.dataset.document;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
@@ -15,6 +16,7 @@ import com.coderabbit214.bibliothecarius.vector.VectorFactory;
 import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -325,6 +327,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                     points.add(point);
                 }
                 documentQdrant.setQdrantId(ids.toString());
+                documentQdrant.setState(DocumentStateEnum.COMPLETE.value());
                 documentQdrantService.updateById(documentQdrant);
                 PointCreateRequest request = new PointCreateRequest();
                 request.setPoints(points);

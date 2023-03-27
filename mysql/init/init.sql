@@ -30,14 +30,13 @@ create table document
 
 create table document_qdrant
 (
+    id          bigint auto_increment
+        primary key,
     document_id bigint       not null comment 'document_id',
     qdrant_id   varchar(255) not null comment 'qdrant_id',
     info        text         not null comment 'info',
-    state       varchar(255) not null comment '处理状态 processing，complete,error',
-    primary key (document_id, qdrant_id)
+    state       varchar(255) not null comment '处理状态 processing，complete,error'
 ) comment '文件数据和qdrant关联';
-
-alter table document_qdrant
 
 create table json_qdrant
 (
