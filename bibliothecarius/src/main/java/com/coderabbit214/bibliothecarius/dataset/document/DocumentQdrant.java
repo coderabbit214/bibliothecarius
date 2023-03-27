@@ -16,4 +16,6 @@ import lombok.ToString;
 public class DocumentQdrant {
     private Long documentId;
     private String qdrantId;
+    private String info;
+    private String state;
 }

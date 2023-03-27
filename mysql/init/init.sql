@@ -32,8 +32,12 @@ create table document_qdrant
 (
     document_id bigint       not null comment 'document_id',
     qdrant_id   varchar(255) not null comment 'qdrant_id',
+    info        text         not null comment 'info',
+    state       varchar(255) not null comment '处理状态 processing，complete,error',
     primary key (document_id, qdrant_id)
 ) comment '文件数据和qdrant关联';
+
+alter table document_qdrant
 
 create table json_qdrant
 (
@@ -61,9 +65,9 @@ create table scene
 create table chat_context
 (
     id        varchar(255) not null,
-    sort      int    not null comment '顺序',
-    user      text   not null comment '用户输入',
-    assistant text   not null comment 'ai输出',
+    sort      int          not null comment '顺序',
+    user      text         not null comment '用户输入',
+    assistant text         not null comment 'ai输出',
     primary key (id, sort)
 )
     comment '上下文';
