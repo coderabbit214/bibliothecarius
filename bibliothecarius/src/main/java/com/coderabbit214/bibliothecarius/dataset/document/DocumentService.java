@@ -335,7 +335,6 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             }
             document.setState(DocumentStateEnum.COMPLETE.value());
             this.updateById(document);
-            documentQdrantService.saveBatch(documentQdrants);
         } catch (Exception e) {
             log.error("txt file converted to qdrant exception", e);
             document.setState(DocumentStateEnum.ERROR.value());
