@@ -15,6 +15,7 @@ public class DocumentQdrantService extends ServiceImpl<DocumentQdrantMapper, Doc
 
     /**
      * 根据文档id获取所有的qdrantId
+     *
      * @param documentId
      * @return
      */
@@ -22,5 +23,11 @@ public class DocumentQdrantService extends ServiceImpl<DocumentQdrantMapper, Doc
         LambdaQueryWrapper<DocumentQdrant> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(DocumentQdrant::getDocumentId, documentId);
         return this.list(queryWrapper).stream().map(DocumentQdrant::getQdrantId).toList();
+    }
+
+    public List<DocumentQdrant> getByDocumentId(Long id) {
+        LambdaQueryWrapper<DocumentQdrant> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DocumentQdrant::getDocumentId, id);
+        return this.list(queryWrapper);
     }
 }

@@ -130,7 +130,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             document.setState(DocumentStateEnum.PROCESSING.value());
             this.save(document);
             //向量化至qdrant
-            toQdrant(dataset.getName(), file.getInputStream(), vectorType, type, document);
+            toQdrant(dataset.getName(), file.getInputStream(), vectorType, type, document, true);
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("File read exception:", e);
@@ -147,10 +147,16 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
      * @param document
      * @throws IOException
      */
-    private void toQdrant(String datasetName, InputStream fileInputStream, String vectorType, String type, Document document) throws IOException {
+    private void toQdrant(String datasetName, InputStream fileInputStream, String vectorType, String type, Document document, boolean init) throws IOException {
         switch (type) {
             case FILE_TYPE_TXT:
-                documentService.txtToQdrant(fileInputStream, document, vectorType, datasetName);
+                List<DocumentQdrant> documentQdrants = null;
+                if (init) {
+                    documentQdrants = this.txtSplit(fileInputStream, document);
+                } else {
+                    documentQdrants = documentQdrantService.getByDocumentId(document.getId());
+                }
+                documentService.txtToQdrant(documentQdrants, document, vectorType, datasetName);
                 break;
             case FILE_TYPE_MD:
                 documentService.mdToQdrant(fileInputStream, document, vectorType, datasetName);
@@ -234,21 +240,17 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
     }
 
     /**
-     * txt文件转换为qdrant
+     * txt 文件分隔
      *
      * @param fileInputStream
      * @param document
+     * @return
      */
-    @Async
-    public void txtToQdrant(InputStream fileInputStream, Document document, String vectorType, String datasetName) {
+    public List<DocumentQdrant> txtSplit(InputStream fileInputStream, Document document) {
         try {
-            VectorInterface vectorService = vectorFactory.getVectorService(vectorType);
-            QdrantService qdrantService = new QdrantService();
             //读取文件内容
             BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
             String line = reader.readLine();
-            int i = 1;
-            List<Point> points = new ArrayList<>();
             List<DocumentQdrant> documentQdrants = new ArrayList<>();
             StringBuilder stringBuilder = new StringBuilder();
             while (line != null) {
@@ -264,34 +266,70 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                     line = reader.readLine();
                     continue;
                 }
-                //向量化
-                List<VectorResult> vectorResultList = vectorService.getVector(String.valueOf(stringBuilder));
+                DocumentQdrant documentQdrant = new DocumentQdrant();
+                documentQdrant.setDocumentId(document.getId());
+                String id = UUID.randomUUID().toString();
+                documentQdrant.setQdrantId(id);
+                documentQdrant.setInfo(stringBuilder.toString());
+                documentQdrant.setState(DocumentStateEnum.PROCESSING.value());
+                documentQdrants.add(documentQdrant);
+                line = reader.readLine();
+                stringBuilder = new StringBuilder();
+            }
+            documentQdrantService.saveBatch(documentQdrants);
+            return documentQdrants;
+        } catch (Exception e) {
+            log.error("txt file converted to qdrant exception", e);
+            document.setState(DocumentStateEnum.ERROR.value());
+            this.updateById(document);
+            throw new BusinessException("txt file converted to qdrant exception");
+        }
+    }
 
-                for (VectorResult vectorResult : vectorResultList) {
+    /**
+     * txt文件转换为qdrant
+     *
+     * @param documentQdrants
+     * @param vectorType
+     */
+    @Async
+    public void txtToQdrant(List<DocumentQdrant> documentQdrants, Document document, String vectorType, String datasetName) {
+
+        try {
+            QdrantService qdrantService = new QdrantService();
+            VectorInterface vectorService = vectorFactory.getVectorService(vectorType);
+            for (DocumentQdrant documentQdrant : documentQdrants) {
+                if (Objects.equals(documentQdrant.getState(), DocumentStateEnum.COMPLETE.value())) {
+                    continue;
+                }
+                List<Point> points = new ArrayList<>();
+                String info = documentQdrant.getInfo();
+                List<VectorResult> vectorResultList = vectorService.getVector(info);
+                StringBuilder ids = new StringBuilder(documentQdrant.getQdrantId());
+                for (int i = 0; i < vectorResultList.size(); i++) {
+                    VectorResult vectorResult = vectorResultList.get(i);
                     //存储至qdrant
                     QdrantDocument qdrantDocument = new QdrantDocument();
-                    qdrantDocument.setDocumentId(document.getId());
+                    qdrantDocument.setDocumentId(documentQdrant.getDocumentId());
                     qdrantDocument.setContext(vectorResult.getText());
-                    qdrantDocument.setInfo("No." + i + "line");
-
                     Point point = new Point();
-                    String id = UUID.randomUUID().toString();
+                    String id = documentQdrant.getQdrantId();
+                    if (i != 0) {
+                        id = UUID.randomUUID().toString();
+                        ids.append(",");
+                        ids.append(id);
+                    }
                     point.setId(id);
                     point.setVector(vectorResult.getVector());
                     point.setPayload(qdrantDocument);
                     points.add(point);
-                    DocumentQdrant documentQdrant = new DocumentQdrant();
-                    documentQdrant.setDocumentId(document.getId());
-                    documentQdrant.setQdrantId(id);
-                    documentQdrants.add(documentQdrant);
                 }
-                line = reader.readLine();
-                stringBuilder = new StringBuilder();
-                i++;
+                documentQdrant.setQdrantId(ids.toString());
+                documentQdrantService.updateById(documentQdrant);
+                PointCreateRequest request = new PointCreateRequest();
+                request.setPoints(points);
+                qdrantService.createPoints(datasetName, request);
             }
-            PointCreateRequest request = new PointCreateRequest();
-            request.setPoints(points);
-            qdrantService.createPoints(datasetName, request);
             document.setState(DocumentStateEnum.COMPLETE.value());
             this.updateById(document);
             documentQdrantService.saveBatch(documentQdrants);
@@ -369,7 +407,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             URL url = new URL(fileUrl);
             URLConnection urlConnection = url.openConnection();
             InputStream inputStream = urlConnection.getInputStream();
-            toQdrant(dataset.getName(), inputStream, dataset.getVectorType(), document.getType(), document);
+            toQdrant(dataset.getName(), inputStream, dataset.getVectorType(), document.getType(), document, false);
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("File read exception:", e);
