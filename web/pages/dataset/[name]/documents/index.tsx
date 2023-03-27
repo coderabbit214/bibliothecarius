@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 import Document from '@/models/document';
 import {getDocuments, uploadDocument, deleteDocument, reprocessDocument} from '@/services/document-service';
+import usePolling from "@/hooks/polling";
 
 const {Column} = Table;
 
@@ -22,6 +23,8 @@ const DocumentPage = () => {
     const docs = await getDocuments(datasetName as string);
     setDocuments(docs);
   };
+
+  usePolling(fetchDocuments, 5000);
 
   const handleUpload = async (info: any) => {
     if (info.file.status === 'done') {
