@@ -1,5 +1,7 @@
 # 分析书籍
 
+警示：尽管本项目提供的样例《动物庄园》在大部分国家均已进入公共领域，可以免费使用和传播，但是你依然要遵照当地法律以确定下载该文档不会触及版权问题。
+
 ## 0.前置
 
 按照https://github.com/coderabbit214/bibliothecarius/blob/main/README.md启动项目

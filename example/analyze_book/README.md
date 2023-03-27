@@ -1,5 +1,7 @@
 # Analyzing a Book
 
+Warning: Although the example "Animal Farm" provided by this project has entered the public domain in most countries and can be used and distributed freely, you still need to follow local laws to ensure that downloading this document does not infringe on copyright issues.
+
 ## 0.Prerequisite
 
 Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob/main/README.mdto launch the project.
@@ -20,19 +22,19 @@ Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob
 >
 > parsing type：Vectorization parameter, currently only supports`openaiVector`
 
-![截屏2023-03-26 15.59.12](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162014.png)
+![0365f05774103bc4518506b8e1790a30](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-210431.jpg)
 
 3. Enter`dataset`
 
-![截屏2023-03-26 16.22.56](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162345.png)
+![6e6ac7c23fdd08da756a70dc9362c276](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-210440.jpg)
 
-4. Upload data`./动物庄园.txt`
+4. Upload file`./animal-farm.txt`
 
 ![截屏2023-03-26 15.59.39](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162545.png)
 
 5. Wait for processing to succeed
 
-![截屏2023-03-26 15.59.39的副本](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162605.png)
+![fa13e671936413396d0eb9d49cec9fc7](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-210447.jpg)
 
 ## 2.CreateScene
 
@@ -40,9 +42,9 @@ Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob
 
 ![截屏2023-03-26 16.26.21](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162723.png)
 
-2. 填写数据
+2. Fill the form
 
-> 参数说明：
+> Parameter description：
 >
 > name: Unique identifier
 >
@@ -56,7 +58,7 @@ Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob
 >
 > parameters：OpenAI parameters, related concepts can be found on the OpenAI website
 
-![截屏2023-03-26 16.26.32](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162751.png)
+![1d5ca119001fa1b7e845becc7be5f1c2](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-210412.jpg)
 
 ## 3. Test
 
