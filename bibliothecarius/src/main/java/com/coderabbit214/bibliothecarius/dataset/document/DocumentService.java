@@ -162,6 +162,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     /**
      * md文件转化为qdrant
+     *
      * @param fileInputStream
      * @param document
      * @param vectorType
@@ -214,8 +215,8 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             log.error("md file converted to qdrant exception", e);
             document.setState(DocumentStateEnum.ERROR.value());
             this.updateById(document);
-        }finally {
-            if (reader != null){
+        } finally {
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -249,14 +250,22 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             int i = 1;
             List<Point> points = new ArrayList<>();
             List<DocumentQdrant> documentQdrants = new ArrayList<>();
+            StringBuilder stringBuilder = new StringBuilder();
             while (line != null) {
                 //根据句子分隔
                 if ("".equals(line)) {
                     line = reader.readLine();
                     continue;
                 }
+                stringBuilder.append(line);
+                //去除末尾所有空格
+                line = line.trim();
+                if (!line.endsWith("。") && !line.endsWith("！") && !line.endsWith("？") && !line.endsWith(".") && !line.endsWith("!") && !line.endsWith("?")) {
+                    line = reader.readLine();
+                    continue;
+                }
                 //向量化
-                List<VectorResult> vectorResultList = vectorService.getVector(line);
+                List<VectorResult> vectorResultList = vectorService.getVector(String.valueOf(stringBuilder));
 
                 for (VectorResult vectorResult : vectorResultList) {
                     //存储至qdrant
@@ -277,6 +286,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                     documentQdrants.add(documentQdrant);
                 }
                 line = reader.readLine();
+                stringBuilder = new StringBuilder();
                 i++;
             }
             PointCreateRequest request = new PointCreateRequest();
