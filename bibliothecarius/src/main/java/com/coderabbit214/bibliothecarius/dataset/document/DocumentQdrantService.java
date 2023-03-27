@@ -30,4 +30,8 @@ public class DocumentQdrantService extends ServiceImpl<DocumentQdrantMapper, Doc
         queryWrapper.eq(DocumentQdrant::getDocumentId, id);
         return this.list(queryWrapper);
     }
+
+    public void deleteByDocumentId(Long id) {
+        this.remove(new LambdaQueryWrapper<DocumentQdrant>().eq(DocumentQdrant::getDocumentId, id));
+    }
 }

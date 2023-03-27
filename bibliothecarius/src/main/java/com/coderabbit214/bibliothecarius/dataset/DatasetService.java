@@ -3,6 +3,7 @@ package com.coderabbit214.bibliothecarius.dataset;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
+import com.coderabbit214.bibliothecarius.dataset.document.DocumentService;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
 import com.coderabbit214.bibliothecarius.qdrant.collection.CollectionRequest;
 import com.coderabbit214.bibliothecarius.qdrant.collection.Vectors;
@@ -14,6 +15,7 @@ import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +38,12 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
 
     private final JsonQdrantService jsonQdrantService;
 
+    private final DocumentService documentService;
 
-    public DatasetService(VectorFactory vectorFactory, JsonQdrantService jsonQdrantService) {
+    public DatasetService(VectorFactory vectorFactory, JsonQdrantService jsonQdrantService, DocumentService documentService) {
         this.vectorFactory = vectorFactory;
         this.jsonQdrantService = jsonQdrantService;
+        this.documentService = documentService;
     }
 
     public boolean checkName(Long id, String name) {
@@ -95,6 +99,8 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
     public void delete(Long id) {
         Dataset dataset = this.getById(id);
         this.removeById(id);
+        jsonQdrantService.deleteByDatasetId(dataset.getId());
+        documentService.deleteByDatasetId(dataset.getId());
         QdrantService qdrantService = new QdrantService();
         qdrantService.deleteCollection(dataset.getName());
     }

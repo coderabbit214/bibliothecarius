@@ -37,9 +37,9 @@ public class DocumentController {
     }
 
     @PostMapping("/{name}/document")
-    @Operation(summary = "file update")
-    public RestResult<?> updateFile(@PathVariable("name") String name, MultipartFile file) {
-        documentService.updateFile(name, file);
+    @Operation(summary = "file upload")
+    public RestResult<?> uploadFile(@PathVariable("name") String name, MultipartFile file) {
+        documentService.uploadFile(name, file);
         return RestResultUtils.success();
     }
 

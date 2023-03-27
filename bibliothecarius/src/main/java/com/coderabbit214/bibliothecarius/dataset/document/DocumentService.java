@@ -17,7 +17,6 @@ import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -67,7 +66,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private final AliParserService aliParserService;
 
-    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory, DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
+    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory,@Lazy DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
         this.storageFactory = storageFactory;
         this.vectorFactory = vectorFactory;
         this.datasetService = datasetService;
@@ -82,7 +81,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
      * @param name
      * @param file
      */
-    public void updateFile(String name, MultipartFile file) {
+    public void uploadFile(String name, MultipartFile file) {
         Dataset dataset = datasetService.getByName(name);
         if (dataset == null) {
             throw new BusinessException("dataset does not exist");
@@ -425,5 +424,22 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     public List<Document> listByQuery(String name, DocumentQuery pageParam) {
         return baseMapper.listByQuery(name, pageParam);
+    }
+
+
+    public void deleteByDatasetId(Long id) {
+        List<Document> documents = this.listByDatasetId(id);
+        if (documents.size() > 0) {
+            for (Document document : documents) {
+                this.removeById(document.getId());
+                documentQdrantService.deleteByDocumentId(document.getId());
+            }
+        }
+    }
+
+    private List<Document> listByDatasetId(Long id) {
+        LambdaQueryWrapper<Document> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Document::getDatasetId, id);
+        return this.list(queryWrapper);
     }
 }
