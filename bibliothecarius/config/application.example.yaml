@@ -37,3 +37,8 @@ storage:
     keyid: xxx
     keysecret: xxx
     bucketName: xxx
+
+ali-parser:
+  endpoint: docmind-api.cn-hangzhou.aliyuncs.com
+  keyid: xxx
+  keysecret: xxx
