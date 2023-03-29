@@ -24,9 +24,9 @@ public interface ModelInterface {
      *
      * @param scene           场景
      * @param input           用户输入
-     * @param data            相关数据
+     * @param dataList        相关数据
      * @param chatContextList 上下文数据
      * @return
      */
-    List<String> chat(Scene scene, String input, String data, List<ChatContext> chatContextList);
+    List<String> chat(Scene scene, String input, List<String> dataList, List<ChatContext> chatContextList);
 }

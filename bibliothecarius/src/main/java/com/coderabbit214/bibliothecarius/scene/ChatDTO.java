@@ -16,5 +16,14 @@ public class ChatDTO {
      * 上下文id
      */
     private String contextId;
+
+    /**
+     * 上下文数量 默认3
+     */
+    private Integer historySize = 3;
+
+    /**
+     * 用户输入
+     */
     private String context;
 }

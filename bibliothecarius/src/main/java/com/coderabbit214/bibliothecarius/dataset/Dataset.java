@@ -46,6 +46,11 @@ public class Dataset implements Serializable {
     private String vectorType;
 
     /**
+     * 查询相关数据条数
+     */
+    private Integer relevantSize;
+
+    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

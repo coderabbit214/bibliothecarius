@@ -28,7 +28,7 @@ public class OpenAiUtil {
         String[] split = text.split("\n");
         for (String s : split) {
             String[] words = s.split(" ");
-            count += words.length / 3 * 5;
+            count += words.length / 3 * 4;
         }
         text = text.replaceAll("\n", "");
         //去掉所有字母

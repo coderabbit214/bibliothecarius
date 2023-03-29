@@ -24,6 +24,11 @@ public class OpenAiChatService implements ModelInterface {
     @Value("${openai.api-key}")
     private String apiKey;
 
+    /**
+     * 请求数据最大值
+     */
+    public static final Integer MAX_TOKEN = 3000;
+
     @Override
     public void checkParams(String params) {
         ChatRequest chatRequest = JsonUtil.toObject(params, ChatRequest.class);
@@ -34,14 +39,24 @@ public class OpenAiChatService implements ModelInterface {
     }
 
     @Override
-    public List<String> chat(Scene scene, String input, String data, List<ChatContext> chatContextList) {
+    public List<String> chat(Scene scene, String input, List<String> dataList, List<ChatContext> chatContextList) {
         List<String> result = new ArrayList<>();
         ChatRequest chatRequest = JsonUtil.toObject(scene.getParams(), ChatRequest.class);
 
-        //补充上下文
-        for (int i = chatContextList.size() - 1; i >= 0 && i > chatContextList.size() - 3; i--) {
+        StringBuilder tokens = new StringBuilder();
+
+        //前置计算
+        List<ChatMessage> messages = chatRequest.getMessages();
+        if (messages != null) {
+            for (ChatMessage message : messages) {
+                tokens.append(message.getContent());
+                tokens.append("\n");
+            }
+        }
+
+        //上下文组装
+        for (ChatContext chatContext : chatContextList) {
             ChatMessage chatMessage = new ChatMessage();
-            ChatContext chatContext = chatContextList.get(i);
             chatMessage.setContent(chatContext.getUser());
             chatMessage.setRole(ChatMessageRole.USER.value());
             chatRequest.getMessages().add(chatMessage);
@@ -49,6 +64,27 @@ public class OpenAiChatService implements ModelInterface {
             chatMessage.setContent(chatContext.getAssistant());
             chatMessage.setRole(ChatMessageRole.ASSISTANT.value());
             chatRequest.getMessages().add(chatMessage);
+
+            tokens.append(chatContext.getUser());
+            tokens.append("\n");
+            tokens.append(chatContext.getAssistant());
+            tokens.append("\n");
+        }
+
+        //相关数据组装
+        StringBuilder data = new StringBuilder();
+        if (dataList != null && dataList.size() > 0) {
+            for (int i = 0; i < dataList.size(); i++) {
+                if (OpenAiUtil.getTokens(tokens.toString()) > MAX_TOKEN) {
+                    break;
+                }
+                data.append("\n");
+                data.append(i + 1).append(".");
+                data.append(dataList.get(i));
+                tokens.append("\n");
+                tokens.append(i + 1).append(".");
+                tokens.append(dataList.get(i));
+            }
         }
 
         ChatMessage chatMessage = new ChatMessage();
@@ -62,13 +98,6 @@ public class OpenAiChatService implements ModelInterface {
         if (maxTokens != null) {
             chatRequest.setMaxTokens(maxTokens - OpenAiUtil.getTokens(template));
         }
-        List<ChatMessage> messages = chatRequest.getMessages();
-        messages.forEach(message -> {
-            String messageContent = message.getContent();
-            if (messageContent != null) {
-                message.setContent(messageContent.replace("${data}", data));
-            }
-        });
         OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(60));
         ChatResult chatCompletion = openAiService.createChatCompletion(chatRequest);
         List<ChatChoice> choices = chatCompletion.getChoices();

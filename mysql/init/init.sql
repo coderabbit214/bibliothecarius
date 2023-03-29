@@ -2,13 +2,14 @@ create database ai_librarian;
 use ai_librarian;
 create table dataset
 (
-    id          bigint auto_increment
+    id            bigint auto_increment
         primary key,
-    name        varchar(20)                         not null comment '名称，唯一',
-    remark      varchar(255)                        null comment '备注',
-    vector_type varchar(255)                        not null comment '使用向量计算方式',
-    create_time timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_time timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '修改时间'
+    name          varchar(20)                         not null comment '名称，唯一',
+    remark        varchar(255)                        null comment '备注',
+    relevant_size int       default 3                 not null comment '查询相关数据条数',
+    vector_type   varchar(255)                        not null comment '使用向量计算方式',
+    create_time   timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time   timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '修改时间'
 ) comment '数据集';
 
 

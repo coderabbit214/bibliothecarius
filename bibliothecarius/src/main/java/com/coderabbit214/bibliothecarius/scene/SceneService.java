@@ -126,11 +126,13 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
         }
         List<ChatContext> chatContextList = new ArrayList<>();
         if (chatDTO.getContextId() != null) {
-            chatContextList = chatContextService.listById(chatDTO.getContextId());
+            chatContextList = chatContextService.listByIdLimit(chatDTO.getContextId(), chatDTO.getHistorySize());
         }
         ChatResult chatResult = new ChatResult();
         List<Object> jsonData = new ArrayList<>();
-        StringBuilder dataList = new StringBuilder();
+
+        List<String> relevantDataList = new ArrayList<>();
+
         if (scene.getDatasetId() != null) {
             VectorInterface vectorService = vectorFactory.getVectorService(VectorInterface.TYPE_OPENAI_VECTOR);
             List<VectorResult> vectorResultList = vectorService.getVector(chatDTO.getContext());
@@ -138,7 +140,7 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
             QdrantService qdrantService = new QdrantService();
             Dataset dataset = datasetService.getById(scene.getDatasetId());
             PointSearchRequest pointSearchRequest = new PointSearchRequest();
-            pointSearchRequest.setLimit(5);
+            pointSearchRequest.setLimit(dataset.getRelevantSize());
             pointSearchRequest.setVector(vector);
             pointSearchRequest.setWithPayload(true);
             PointSearchParams params = new PointSearchParams();
@@ -151,15 +153,13 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
                 jsonData.add(pointSearchResponse.getPayload());
                 JsonNode jsonNode = JsonUtil.toObject(JsonUtil.toJsonString(pointSearchResponse.getPayload()), JsonNode.class);
                 String content = jsonNode.get("context").asText();
-                dataList.append("\n");
-                dataList.append(i + 1).append(".");
-                dataList.append(content);
+                relevantDataList.add(content);
             }
         }
         chatResult.setJsonData(jsonData);
         ModelInterface modelService = modelFactory.getModelService(scene.getModelType());
 
-        List<String> contexts = modelService.chat(scene, chatDTO.getContext(), dataList.toString(), chatContextList);
+        List<String> contexts = modelService.chat(scene, chatDTO.getContext(), relevantDataList, chatContextList);
 
         chatResult.setContents(contexts);
 
