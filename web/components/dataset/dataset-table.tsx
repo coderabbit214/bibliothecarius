@@ -86,6 +86,11 @@ const DatasetTable: React.FC = () => {
       key: "vectorType",
     },
     {
+      title: "Relevant Size",
+      dataIndex: "relevantSize",
+      key: "relevantSize",
+    },
+    {
       title: "Creation Time",
       dataIndex: "createTime",
       key: "createTime",

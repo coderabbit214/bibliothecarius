@@ -88,6 +88,13 @@ const DatasetDrawer: React.FC<DatasetDrawerProps> = ({
         >
           <Input placeholder="Please enter a parsing type" />
         </Form.Item>
+        <Form.Item
+            name="relevantSize"
+            label="Relevant Size"
+            rules={[{required: true, message: "Please enter a relevant size"}]}
+        >
+          <Input placeholder="Please enter a parsing type" />
+        </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit
