@@ -8,7 +8,7 @@ import {
 import {
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined,
+  DeleteOutlined, MessageOutlined,
 } from "@ant-design/icons";
 import Scene from "@/models/scene";
 import {
@@ -19,6 +19,7 @@ import SceneDrawer from "./scene-drawer";
 import Dataset from "@/models/dataset";
 import {getDatasets} from "@/services/dataset-service";
 import usePolling from "@/hooks/polling";
+import Link from "next/link";
 
 const SceneTable: React.FC = () => {
   const [scenes, setScenes] = useState<Scene[]>([]);
@@ -127,6 +128,9 @@ const SceneTable: React.FC = () => {
       key: "action",
       render: (_: any, record: Scene) => (
         <div className="flex space-x-2">
+          <Link href={`/scene/${record.name}/chat`}>
+            <Button type="primary" icon={<MessageOutlined />} />
+          </Link>
           <Button
             type="primary"
             icon={<EditOutlined />}

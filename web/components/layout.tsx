@@ -17,12 +17,11 @@ const LayoutWrapper = ({children}: Props) => {
       <Sidebar />
       <Layout className="bg-white">
         <Header />
-        <Content style={{margin: '0 16px'}}>
-          <div className="bg-white" style={{padding: 24, minHeight: 360}}>
+        <Content style={{ margin: "0 16px" }}>
+          <div className="bg-white h-full" style={{ padding: 24 }}>
             {children}
           </div>
         </Content>
-        <Footer style={{textAlign: 'center'}}>Convect AI ©2022</Footer>
       </Layout>
     </Layout>
   );
