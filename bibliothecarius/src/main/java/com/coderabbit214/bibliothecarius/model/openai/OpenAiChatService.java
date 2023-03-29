@@ -69,7 +69,7 @@ public class OpenAiChatService implements ModelInterface {
                 message.setContent(messageContent.replace("${data}", data));
             }
         });
-        OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(30));
+        OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(60));
         ChatResult chatCompletion = openAiService.createChatCompletion(chatRequest);
         List<ChatChoice> choices = chatCompletion.getChoices();
         for (ChatChoice choice : choices) {
