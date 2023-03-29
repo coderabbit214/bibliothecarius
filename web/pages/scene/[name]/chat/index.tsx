@@ -30,12 +30,23 @@ const Chat = () => {
     chat(sceneName as string, chatData)
       .then((res) => {
         chatResult = res;
-        // Display AI message after receiving response
-        addMessageToConversations(chatResult.contents.join(" "), false);
+        // Update the last message with AI message after receiving response
+        setConversations((prevConversations) => {
+          const updatedConversations = [...prevConversations];
+          const lastIndex = updatedConversations.length - 1;
+          const lastMessageIndex =
+            updatedConversations[lastIndex].messages.length - 1;
+          updatedConversations[lastIndex].messages[lastMessageIndex].aiMessage = [
+            ...chatResult.contents,
+          ];
+          return updatedConversations;
+        });
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
         chatResult.contents = ["Error, please try again"];
+        setLoading(false);
       });
   };
 
@@ -44,7 +55,7 @@ const Chat = () => {
     isUserMessage: boolean
   ) => {
     const newMessage: ChatMessage = {
-      userMessage: isUserMessage ? message : "",
+      userMessage: isUserMessage ? message : undefined,
       aiMessage: isUserMessage ? [] : [message],
     };
 
@@ -86,11 +97,15 @@ const Chat = () => {
       <div className="flex-1 overflow-y-auto">
         {conversations.flatMap((conv) => conv.messages).map((message: ChatMessage, index: number) => (
           <div key={index} className="mb-4">
-            <div
-              className="bg-blue-500 text-white rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1 inline-block mb-1">
-              <strong>User:</strong> {message.userMessage}
-            </div>
-            <br />
+            {message.userMessage &&
+              (<>
+                <div
+                  className="bg-blue-500 text-white rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1 inline-block mb-1">
+                  <strong>User:</strong> {message.userMessage}
+                </div>
+                <br />
+              </>)
+            }
             {message.aiMessage.map((aiMsg, idx) => (
               <div key={idx}
                    className="bg-gray-300 text-black rounded-tl-lg rounded-tr-lg rounded-br-lg px-3 py-1 inline-block mt-1">
@@ -112,6 +127,7 @@ const Chat = () => {
           onPressEnter={handleSendMessage}
           placeholder="Type your message here"
           className="mb-4"
+          disabled={loading}
         />
         <div className="flex justify-between items-center">
           <Button onClick={handleSendMessage} className="mr-4">

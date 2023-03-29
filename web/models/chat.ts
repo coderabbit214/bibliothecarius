@@ -11,7 +11,7 @@ export interface ChatResult {
 }
 
 export interface ChatMessage {
-  userMessage: string;
+  userMessage?: string;
   aiMessage: string[];
 }
 
