@@ -38,3 +38,7 @@ function updateSceneParams(scene: Scene): Scene {
   scene.params = (typeof scene.params === 'string' || scene.params instanceof String) ? JSON.parse(scene.params as string) as any : scene.params;
   return scene;
 }
+
+export function getModelTypes(): Promise<string[]> {
+  return fetch(`/api/scene/model/type`);
+}

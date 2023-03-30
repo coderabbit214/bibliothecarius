@@ -4,6 +4,7 @@ import Scene from "@/models/scene";
 import {addScene, updateScene} from "@/services/scene-service";
 import DatasetSelect from "@/components/dataset/dataset-select";
 import {HttpError} from "@/libs/fetch";
+import ModelSelect from "@/components/scene/model-select";
 
 interface SceneDrawerProps {
   visible: boolean;
@@ -103,9 +104,7 @@ const SceneDrawer: React.FC<SceneDrawerProps> = ({
             },
           ]}
         >
-          <Select>
-            <Select.Option value="openaiChat">OpenAI</Select.Option>
-          </Select>
+          <ModelSelect />
         </Form.Item>
 
         <Form.Item
