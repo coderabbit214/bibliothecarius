@@ -7,6 +7,7 @@ import com.coderabbit214.bibliothecarius.common.utils.JsonUtil;
 import com.coderabbit214.bibliothecarius.common.utils.SpringUtil;
 import com.coderabbit214.bibliothecarius.dataset.Dataset;
 import com.coderabbit214.bibliothecarius.dataset.DatasetService;
+import com.coderabbit214.bibliothecarius.externalModel.ExternalModelService;
 import com.coderabbit214.bibliothecarius.model.ModelFactory;
 import com.coderabbit214.bibliothecarius.model.ModelInterface;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
@@ -20,6 +21,7 @@ import com.coderabbit214.bibliothecarius.vector.VectorFactory;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,11 +47,14 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
 
     private final ChatContextService chatContextService;
 
-    public SceneService(ModelFactory modelFactory, VectorFactory vectorFactory, DatasetService datasetService, ChatContextService chatContextService) {
+    private final ExternalModelService externalModelService;
+
+    public SceneService(ModelFactory modelFactory, VectorFactory vectorFactory, DatasetService datasetService, ChatContextService chatContextService, ExternalModelService externalModelService) {
         this.modelFactory = modelFactory;
         this.vectorFactory = vectorFactory;
         this.datasetService = datasetService;
         this.chatContextService = chatContextService;
+        this.externalModelService = externalModelService;
     }
 
     /**
@@ -72,13 +77,13 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
         }
         //检查模型类型
         String modelType = scene.getModelType();
-        List<String> modelTypes = ModelInterface.MODEL_TYPES;
+        List<String> modelTypes = this.getModelType();
         if (!modelTypes.contains(modelType)) {
             throw new BusinessException("model type does not exist");
         }
         //模型参数检查
         ModelInterface modelService = modelFactory.getModelService(modelType);
-        modelService.checkParams(scene.getParams());
+        modelService.checkParams(scene);
     }
 
     public boolean checkName(Long id, String name) {
@@ -182,5 +187,18 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
         chatContextService.save(chatContext);
         chatResult.setContextId(chatContext.getId());
         return chatResult;
+    }
+
+    public Long countByModelType(String modelType) {
+        LambdaQueryWrapper<Scene> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Scene::getModelType, modelType);
+        return this.count(queryWrapper);
+    }
+
+    public List<String> getModelType() {
+        List<String> names = externalModelService.getNameList();
+        List<String> modelTypes = new ArrayList<>(ModelInterface.MODEL_TYPES);
+        modelTypes.addAll(names);
+        return modelTypes;
     }
 }

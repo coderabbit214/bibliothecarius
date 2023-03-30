@@ -4,7 +4,7 @@ import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
 import com.coderabbit214.bibliothecarius.common.utils.JsonUtil;
 import com.coderabbit214.bibliothecarius.model.ModelInterface;
 import com.coderabbit214.bibliothecarius.openai.OpenAiService;
-import com.coderabbit214.bibliothecarius.openai.OpenAiUtil;
+import com.coderabbit214.bibliothecarius.common.utils.TokenUtil;
 import com.coderabbit214.bibliothecarius.openai.chat.*;
 import com.coderabbit214.bibliothecarius.scene.Scene;
 import com.coderabbit214.bibliothecarius.scene.context.ChatContext;
@@ -30,8 +30,8 @@ public class OpenAiChatService implements ModelInterface {
     public static final Integer MAX_TOKEN = 3000;
 
     @Override
-    public void checkParams(String params) {
-        ChatRequest chatRequest = JsonUtil.toObject(params, ChatRequest.class);
+    public void checkParams(Scene scene) {
+        ChatRequest chatRequest = JsonUtil.toObject(scene.getParams(), ChatRequest.class);
         String model = chatRequest.getModel();
         if (!ChatRequest.MODEL_TYPES.contains(model)) {
             throw new BusinessException("openai model type does not exist");
@@ -75,7 +75,7 @@ public class OpenAiChatService implements ModelInterface {
         StringBuilder data = new StringBuilder();
         if (dataList != null && dataList.size() > 0) {
             for (int i = 0; i < dataList.size(); i++) {
-                if (OpenAiUtil.getTokens(tokens.toString()) > MAX_TOKEN) {
+                if (TokenUtil.getTokens(tokens.toString()) > MAX_TOKEN) {
                     break;
                 }
                 data.append("\n");
@@ -96,7 +96,7 @@ public class OpenAiChatService implements ModelInterface {
         chatRequest.getMessages().add(chatMessage);
         Integer maxTokens = chatRequest.getMaxTokens();
         if (maxTokens != null) {
-            chatRequest.setMaxTokens(maxTokens - OpenAiUtil.getTokens(template));
+            chatRequest.setMaxTokens(maxTokens - TokenUtil.getTokens(template));
         }
         OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(60));
         ChatResult chatCompletion = openAiService.createChatCompletion(chatRequest);

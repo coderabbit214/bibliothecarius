@@ -15,9 +15,9 @@ public interface ModelInterface {
     /**
      * check params
      *
-     * @param params
+     * @param scene
      */
-    void checkParams(String params);
+    void checkParams(Scene scene);
 
     /**
      * chat

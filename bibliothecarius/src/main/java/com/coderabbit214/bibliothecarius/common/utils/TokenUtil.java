@@ -1,6 +1,6 @@
-package com.coderabbit214.bibliothecarius.openai;
+package com.coderabbit214.bibliothecarius.common.utils;
 
-public class OpenAiUtil {
+public class TokenUtil {
 
     /**
      * 英文一个单词一个token

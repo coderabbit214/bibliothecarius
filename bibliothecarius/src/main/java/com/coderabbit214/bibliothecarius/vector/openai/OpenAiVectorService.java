@@ -1,7 +1,7 @@
 package com.coderabbit214.bibliothecarius.vector.openai;
 
 import com.coderabbit214.bibliothecarius.openai.OpenAiService;
-import com.coderabbit214.bibliothecarius.openai.OpenAiUtil;
+import com.coderabbit214.bibliothecarius.common.utils.TokenUtil;
 import com.coderabbit214.bibliothecarius.openai.embedding.Embedding;
 import com.coderabbit214.bibliothecarius.openai.embedding.EmbeddingRequest;
 import com.coderabbit214.bibliothecarius.openai.embedding.EmbeddingResult;
@@ -35,14 +35,14 @@ public class OpenAiVectorService implements VectorInterface {
         List<VectorResult> vectorResults = new ArrayList<>();
 
         OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(60));
-        Integer tokens = OpenAiUtil.getTokens(text);
+        Integer tokens = TokenUtil.getTokens(text);
 
         List<String> texts = new ArrayList<>();
         if (tokens > MAX_TOKEN) {
             //按句子拆分 。？！!?.
             String[] sentences = text.split("[。？！!?.]");
             for (String sentence : sentences) {
-                if (OpenAiUtil.getTokens(sentence) < MAX_TOKEN) {
+                if (TokenUtil.getTokens(sentence) < MAX_TOKEN) {
                     texts.add(sentence);
                 } else {
                     //按照

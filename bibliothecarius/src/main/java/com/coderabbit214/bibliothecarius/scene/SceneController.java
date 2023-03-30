@@ -81,4 +81,10 @@ public class SceneController {
         ChatResult chatResult = sceneService.chat(name, chatDTO);
         return RestResultUtils.success(chatResult);
     }
+
+    @GetMapping("/model/type")
+    @Operation(summary = "获取可选模型类型")
+    public RestResult<?> getModelType() {
+        return RestResultUtils.success(sceneService.getModelType());
+    }
 }

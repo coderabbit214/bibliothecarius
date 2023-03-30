@@ -71,3 +71,17 @@ create table chat_context
     primary key (id, sort)
 )
     comment '上下文';
+
+create table external_model
+(
+    id                       bigint auto_increment
+        primary key,
+    name                     varchar(30)                         not null comment '名称',
+    remark                   varchar(255)                        null comment '简介',
+    chat_address             varchar(255)                        not null comment 'chat请求地址',
+    input_max_token          int                                 not null default 3000 comment '输入最大token',
+    check_parameters_address varchar(255)                        null comment '检查参数请求地址',
+    create_time              timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time              timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '修改时间'
+)
+    comment '自定义模型表';
