@@ -31,7 +31,7 @@ public class OpenAiVectorService implements VectorInterface {
     private String apiKey;
 
     @Override
-    public List<VectorResult> getVector(String text) {
+    public List<VectorResult> getVector(String text, String vectorType) {
         List<VectorResult> vectorResults = new ArrayList<>();
 
         OpenAiService openAiService = new OpenAiService(apiKey, Duration.ofSeconds(60));

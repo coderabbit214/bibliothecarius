@@ -13,10 +13,11 @@ public interface VectorInterface {
 
     /**
      * 计算向量
+     *
      * @param text
      * @return
      */
-    List<VectorResult> getVector(String text);
+    List<VectorResult> getVector(String text, String vectorType);
 
 
 }

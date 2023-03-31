@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
 import com.coderabbit214.bibliothecarius.dataset.document.DocumentService;
+import com.coderabbit214.bibliothecarius.externalVector.ExternalVector;
+import com.coderabbit214.bibliothecarius.externalVector.ExternalVectorService;
+import com.coderabbit214.bibliothecarius.model.ModelInterface;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
 import com.coderabbit214.bibliothecarius.qdrant.collection.CollectionRequest;
 import com.coderabbit214.bibliothecarius.qdrant.collection.Vectors;
@@ -15,6 +18,7 @@ import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,10 +44,13 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
 
     private final DocumentService documentService;
 
-    public DatasetService(VectorFactory vectorFactory, JsonQdrantService jsonQdrantService, DocumentService documentService) {
+    private final ExternalVectorService externalVectorService;
+
+    public DatasetService(VectorFactory vectorFactory, JsonQdrantService jsonQdrantService, DocumentService documentService, ExternalVectorService externalVectorService) {
         this.vectorFactory = vectorFactory;
         this.jsonQdrantService = jsonQdrantService;
         this.documentService = documentService;
+        this.externalVectorService = externalVectorService;
     }
 
     public boolean checkName(Long id, String name) {
@@ -70,10 +77,15 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
         this.check(dataset);
         this.save(dataset);
         QdrantService qdrantService = new QdrantService();
+        String vectorType = dataset.getVectorType();
+        ExternalVector externalVector = externalVectorService.getByName(vectorType);
         CollectionRequest collectionRequest = new CollectionRequest();
         Vectors vectors = new Vectors();
         vectors.setDistance(VectorsDistance.COSINE.value());
         vectors.setSize(1536);
+        if (externalVector != null) {
+            vectors.setSize(externalVector.getSize());
+        }
         collectionRequest.setVectors(vectors);
         qdrantService.createCollection(dataset.getName(), collectionRequest);
         return dataset;
@@ -90,7 +102,8 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
             throw new BusinessException("duplicate name");
         }
         //检查类型
-        if (!VectorInterface.VECTOR_TYPES.contains(dataset.getVectorType())) {
+        List<String> vectorType = this.getVectorType();
+        if (!vectorType.contains(dataset.getVectorType())) {
             throw new BusinessException("unsupported vector type");
         }
     }
@@ -140,7 +153,7 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
         String context = contextJsonNode.toString();
         //openai 计算
         VectorInterface vectorService = vectorFactory.getVectorService(dataset.getVectorType());
-        List<VectorResult> vectorResultList = vectorService.getVector(context);
+        List<VectorResult> vectorResultList = vectorService.getVector(context, dataset.getVectorType());
 
         List<Point> pointList = new ArrayList<>();
         List<JsonQdrant> jsonQdrantList = new ArrayList<>();
@@ -167,4 +180,16 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
     }
 
 
+    public Long countByVectorType(String vectorType) {
+        LambdaQueryWrapper<Dataset> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dataset::getVectorType, vectorType);
+        return this.count(queryWrapper);
+    }
+
+    public List<String> getVectorType() {
+        List<String> names = externalVectorService.getNameList();
+        List<String> types = new ArrayList<>(VectorInterface.VECTOR_TYPES);
+        types.addAll(names);
+        return types;
+    }
 }

@@ -66,7 +66,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private final AliParserService aliParserService;
 
-    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory,@Lazy DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
+    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory, @Lazy DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
         this.storageFactory = storageFactory;
         this.vectorFactory = vectorFactory;
         this.datasetService = datasetService;
@@ -185,6 +185,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
      */
     @Async
     public void mdToQdrant(InputStream fileInputStream, Document document, String vectorType, String datasetName) {
+        Dataset dataset = datasetService.getByName(datasetName);
         BufferedReader reader = null;
         try {
             VectorInterface vectorService = vectorFactory.getVectorService(vectorType);
@@ -198,7 +199,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
             List<DocumentQdrant> documentQdrants = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("## ")) {
-                    List<VectorResult> vectorResultList = vectorService.getVector(stringBuilder.toString());
+                    List<VectorResult> vectorResultList = vectorService.getVector(stringBuilder.toString(), dataset.getVectorType());
                     for (VectorResult vectorResult : vectorResultList) {
                         //存储至qdrant
                         QdrantDocument qdrantDocument = new QdrantDocument();
@@ -213,6 +214,8 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                         DocumentQdrant documentQdrant = new DocumentQdrant();
                         documentQdrant.setDocumentId(document.getId());
                         documentQdrant.setQdrantId(id);
+                        documentQdrant.setState(DocumentStateEnum.COMPLETE.value());
+                        documentQdrant.setInfo(vectorResult.getText());
                         documentQdrants.add(documentQdrant);
                     }
                     stringBuilder = new StringBuilder();
@@ -303,6 +306,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
      */
     @Async
     public void toVector(List<DocumentQdrant> documentQdrants, Document document, String vectorType, String datasetName) {
+        Dataset dataset = datasetService.getByName(datasetName);
         try {
             QdrantService qdrantService = new QdrantService();
             VectorInterface vectorService = vectorFactory.getVectorService(vectorType);
@@ -312,7 +316,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                 }
                 List<Point> points = new ArrayList<>();
                 String info = documentQdrant.getInfo();
-                List<VectorResult> vectorResultList = vectorService.getVector(info);
+                List<VectorResult> vectorResultList = vectorService.getVector(info, dataset.getVectorType());
                 StringBuilder ids = new StringBuilder(documentQdrant.getQdrantId());
                 for (int i = 0; i < vectorResultList.size(); i++) {
                     VectorResult vectorResult = vectorResultList.get(i);

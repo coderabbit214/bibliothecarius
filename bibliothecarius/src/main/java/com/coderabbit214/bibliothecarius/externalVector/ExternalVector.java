@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.externalModel;
+package com.coderabbit214.bibliothecarius.externalVector;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,18 +13,15 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * External Model
- * </p>
  *
  * @author Mr_J
- * @since 2023-03-29
+ * @since 2023-03-31
  */
-@TableName("external_model")
-@Setter
+@TableName("external_vector")
 @Getter
+@Setter
 @ToString
-public class ExternalModel implements Serializable {
+public class ExternalVector implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,14 +31,13 @@ public class ExternalModel implements Serializable {
     @NotEmpty(message = "name cannot be empty")
     private String name;
 
+    @NotEmpty(message = "size cannot be empty")
+    private Integer size;
+
     private String remark;
 
-    private Integer inputMaxToken;
-
-    @NotEmpty(message = "Chat request address cannot be empty")
-    private String chatAddress;
-
-    private String checkParametersAddress;
+    @NotEmpty(message = "address cannot be empty")
+    private String address;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

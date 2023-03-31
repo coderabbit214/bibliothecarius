@@ -85,3 +85,17 @@ create table external_model
     update_time              timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '修改时间'
 )
     comment '自定义模型表';
+
+create table external_vector
+(
+    id          bigint auto_increment
+        primary key,
+    name        varchar(30)                         not null comment '名称',
+    size        int                                 not null comment '',
+    remark      varchar(255)                        null comment '简介',
+    address     varchar(255)                        not null comment 'chat请求地址',
+    create_time timestamp default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '修改时间'
+)
+    comment '自定义向量计算表';
+

@@ -139,11 +139,11 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
         List<String> relevantDataList = new ArrayList<>();
 
         if (scene.getDatasetId() != null) {
-            VectorInterface vectorService = vectorFactory.getVectorService(VectorInterface.TYPE_OPENAI_VECTOR);
-            List<VectorResult> vectorResultList = vectorService.getVector(chatDTO.getContext());
+            Dataset dataset = datasetService.getById(scene.getDatasetId());
+            VectorInterface vectorService = vectorFactory.getVectorService(dataset.getVectorType());
+            List<VectorResult> vectorResultList = vectorService.getVector(chatDTO.getContext(), dataset.getVectorType());
             List<Double> vector = vectorResultList.get(0).getVector();
             QdrantService qdrantService = new QdrantService();
-            Dataset dataset = datasetService.getById(scene.getDatasetId());
             PointSearchRequest pointSearchRequest = new PointSearchRequest();
             pointSearchRequest.setLimit(dataset.getRelevantSize());
             pointSearchRequest.setVector(vector);
@@ -153,8 +153,7 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
             params.setHnswEf(128);
             pointSearchRequest.setParams(params);
             List<PointSearchResponse> pointSearchResponses = qdrantService.searchPoints(dataset.getName(), pointSearchRequest);
-            for (int i = 0; i < pointSearchResponses.size(); i++) {
-                PointSearchResponse pointSearchResponse = pointSearchResponses.get(i);
+            for (PointSearchResponse pointSearchResponse : pointSearchResponses) {
                 jsonData.add(pointSearchResponse.getPayload());
                 JsonNode jsonNode = JsonUtil.toObject(JsonUtil.toJsonString(pointSearchResponse.getPayload()), JsonNode.class);
                 String content = jsonNode.get("context").asText();

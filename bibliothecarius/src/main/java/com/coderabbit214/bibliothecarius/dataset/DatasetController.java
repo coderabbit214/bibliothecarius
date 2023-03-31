@@ -71,4 +71,11 @@ public class DatasetController {
         return RestResultUtils.success();
     }
 
+    @GetMapping("/vector/type")
+    @Operation(summary = "Get optional vector calculation method")
+    public RestResult<?> getVectorType() {
+        List<String> vectorTypes = datasetService.getVectorType();
+        return RestResultUtils.success(vectorTypes);
+    }
+
 }

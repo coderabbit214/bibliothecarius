@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @ToString
-public class ExternalRequest {
+public class ModelExternalRequest {
     private Object params;
     private String input;
     private List<ChatContext> chatContextList;

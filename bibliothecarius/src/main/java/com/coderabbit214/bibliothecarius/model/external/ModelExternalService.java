@@ -20,11 +20,11 @@ import java.util.List;
  * @since 2023-03-29
  */
 @Service
-public class ExternalService implements ModelInterface {
+public class ModelExternalService implements ModelInterface {
 
     private final ExternalModelService externalModelService;
 
-    public ExternalService(ExternalModelService externalModelService) {
+    public ModelExternalService(ExternalModelService externalModelService) {
         this.externalModelService = externalModelService;
     }
 
@@ -52,7 +52,7 @@ public class ExternalService implements ModelInterface {
         }
 
         //组装数据
-        ExternalRequest externalRequest = new ExternalRequest();
+        ModelExternalRequest externalRequest = new ModelExternalRequest();
         externalRequest.setChatContextList(chatContextList);
         externalRequest.setParams(params);
 

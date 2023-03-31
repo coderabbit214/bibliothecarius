@@ -1,9 +1,8 @@
 package com.coderabbit214.bibliothecarius.model;
 
 import com.coderabbit214.bibliothecarius.externalModel.ExternalModelService;
-import com.coderabbit214.bibliothecarius.model.external.ExternalService;
+import com.coderabbit214.bibliothecarius.model.external.ModelExternalService;
 import com.coderabbit214.bibliothecarius.model.openai.OpenAiChatService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,9 +17,9 @@ public class ModelFactory {
 
     private final OpenAiChatService openAiChatService;
 
-    private final ExternalService externalService;
+    private final ModelExternalService externalService;
 
-    public ModelFactory(OpenAiChatService openAiChatService, ExternalModelService externalModelService, ExternalService externalService) {
+    public ModelFactory(OpenAiChatService openAiChatService, ExternalModelService externalModelService, ModelExternalService externalService) {
         this.openAiChatService = openAiChatService;
         this.externalModelService = externalModelService;
         this.externalService = externalService;
