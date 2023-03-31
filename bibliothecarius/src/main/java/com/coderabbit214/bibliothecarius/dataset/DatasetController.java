@@ -1,5 +1,6 @@
 package com.coderabbit214.bibliothecarius.dataset;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
 import com.coderabbit214.bibliothecarius.common.result.RestResult;
 import com.coderabbit214.bibliothecarius.common.result.RestResultUtils;
@@ -34,7 +35,9 @@ public class DatasetController {
     @GetMapping("/list")
     @Operation(summary = "list")
     public RestResult<?> list() {
-        List<Dataset> datasetList = datasetService.list();
+        LambdaQueryWrapper<Dataset> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Dataset::getCreateTime);
+        List<Dataset> datasetList = datasetService.list(queryWrapper);
         return RestResultUtils.success(datasetList);
     }
 

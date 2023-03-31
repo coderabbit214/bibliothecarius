@@ -21,6 +21,7 @@
                 and d.name like concat('%', #{pageParam.documentName}, '%')
             </if>
         </where>
+        order by d.create_time desc
     </select>
     <select id="listByQuery" resultType="com.coderabbit214.bibliothecarius.dataset.document.Document">
         select d.id,
@@ -41,5 +42,6 @@
                 and d.name like concat('%', #{pageParam.documentName}, '%')
             </if>
         </where>
+        order by d.create_time desc
     </select>
 </mapper>

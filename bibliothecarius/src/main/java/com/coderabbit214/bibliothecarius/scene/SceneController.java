@@ -1,5 +1,6 @@
 package com.coderabbit214.bibliothecarius.scene;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
 import com.coderabbit214.bibliothecarius.common.result.RestResult;
 import com.coderabbit214.bibliothecarius.common.result.RestResultUtils;
@@ -35,7 +36,6 @@ public class SceneController {
     @Operation(summary = "Get detailed information by id")
     public RestResult<?> getSceneById(@PathVariable("id") Long id) {
         Scene scene = sceneService.getById(id);
-        //转化为DTO
         SceneVO sceneVO = new SceneVO();
         BeanUtils.copyProperties(scene, sceneVO);
         sceneVO.setParams(JsonUtil.toObject(scene.getParams(), Object.class));
@@ -45,8 +45,9 @@ public class SceneController {
     @GetMapping("/list")
     @Operation(summary = "list")
     public RestResult<?> list() {
-        List<Scene> sceneList = sceneService.list();
-        //转化为DTO
+        LambdaQueryWrapper<Scene> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Scene::getCreateTime);
+        List<Scene> sceneList = sceneService.list(queryWrapper);
         List<SceneVO> sceneVOList = SceneVO.convert(sceneList);
         return RestResultUtils.success(sceneVOList);
     }
