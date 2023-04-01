@@ -51,4 +51,4 @@ Parameters:
 
 ## 3.Example
 
-- Integration with [text2vec](./Localized Vector Calculation Integration with text2vec-chinese.md)
+- Integration with [text2vec](Localized%20Vector%20Calculation%20Integration%20with%20text2vec-chinese.md)
