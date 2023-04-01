@@ -26,7 +26,11 @@ Bibliothecarius是一个本地数据分析工具，可根据自定义prompt进�
   - [ ] docx
 - [ ] 支持更多的模型
   - [x] gpt3.5
-  - [ ] ChatGLM
+  - [x] 本地化模型
+    - [x] ChatGLM
+- [x] [本地化向量计算](./doc/zh/本地化向量计算接入指南.md)
+  - [x]  [text2vec](./doc/zh/本地化向量计算接入text2vec-chinese.md)
+  
 
 ## 快速开始
 
@@ -85,7 +89,7 @@ Bibliothecarius的接口主要分为两部分：
 
 您可以使用以下例子熟悉Bibliothecarius。
 
-- [分析书籍或材料](https://github.com/coderabbit214/bibliothecarius/blob/main/example/analyze_book/README.md)
+- [分析书籍或材料](example/analyze_book/README.zh.md)
 - 个人或企业知识库问答助手
 
 

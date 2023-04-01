@@ -1,6 +1,6 @@
 # Bibliothecarius
 
-[中文文档](https://github.com/coderabbit214/bibliothecarius/blob/main/README.zh.md)
+[中文文档](./README.zh.md)
 
 
 ## About
@@ -28,7 +28,11 @@ Bibliothecarius is a local data analysis tool that can engage in conversation ba
   - [ ] docx
 - [ ] Support for more models
   - [x] gpt3.5
-  - [ ] ChatGLM
+  - [x] Localized model
+      - [x] ChatGLM
+- [x] [Localized vector computation](./doc/en/Localized Vector Calculation Integration Guide.md)
+    - [x]  [text2vec](./doc/en/Localized Vector Calculation Integration with text2vec-chinese.md)
+
 
 ## Quick Start
 
@@ -83,7 +87,7 @@ The Bibliothecarius interface has two main parts:
 
 You can use the following examples to familiarize yourself with Bibliothecarius.
 
--  [Analyze books ormaterials](https://github.com/coderabbit214/bibliothecarius/blob/main/example/analyze_book/README.md)
+-  [Analyze books ormaterials](example/analyze_book/README.md)
 - Personal or enterprise knowledge base question-and-answer assistant
 
 
