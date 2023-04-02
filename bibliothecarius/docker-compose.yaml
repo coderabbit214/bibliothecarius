@@ -3,6 +3,6 @@ services:
   bibliothecarius:
     build: .
     volumes:
-      - '$PWD/config:/app/config'
+      - '$PWD/config:/config'
     ports:
       - '8080:8080'
