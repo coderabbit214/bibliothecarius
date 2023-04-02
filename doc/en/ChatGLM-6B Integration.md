@@ -8,7 +8,7 @@ Please go to https://github.com/coderabbit214/ChatGLM-6B-bibliothecarius to down
 
 Request interface POST:/external/model to add the interface address to Bibliothecarius.
 
-```json
+```bash
 bashCopy code
 curl --location --request POST 'http://127.0.0.1:8080/external/model' \
 --header 'Content-Type: application/json' \
