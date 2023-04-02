@@ -34,10 +34,22 @@ public class ModelExternalService implements ModelInterface {
         if (externalModel == null) {
             throw new BusinessException("model type does not exist");
         }
-        if (externalModel.getCheckParametersAddress() == null) {
+        if (externalModel.getCheckParametersAddress() == null || externalModel.getCheckParametersAddress().isEmpty()) {
             return;
         }
-        //TODO:参数校验
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(scene.getParams(), headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ModelExternalCheckResult> responseEntity = restTemplate.postForEntity(externalModel.getCheckParametersAddress(), request, ModelExternalCheckResult.class);
+        if (responseEntity.getStatusCode() != HttpStatus.OK) {
+            throw new BusinessException("Abnormal service");
+        }
+        ModelExternalCheckResult modelExternalCheckResult = responseEntity.getBody();
+        if (!modelExternalCheckResult.getSuccess()) {
+            throw new BusinessException("Model parameter error:" + modelExternalCheckResult.getMessage());
+        }
     }
 
     @Override

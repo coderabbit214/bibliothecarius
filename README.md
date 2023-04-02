@@ -26,10 +26,10 @@ Bibliothecarius is a local data analysis tool that can engage in conversation ba
   - [x] pdf
   - [x] md
   - [ ] docx
-- [ ] Support for more models
+- [x] Support for more models
   - [x] gpt3.5
-  - [x] Localized model
-      - [x] ChatGLM
+  - [x] [Localized model](doc%2Fen%2FLocal%20Model%20Integration%20Guide.md)
+      - [x] [ChatGLM](doc%2Fen%2FChatGLM-6B%20Integration.md)
 - [x] [Localized vector computation](doc%2Fen%2FLocalized%20Vector%20Calculation%20Integration%20Guide.md)
     - [x]  [text2vec](doc%2Fen%2FLocalized%20Vector%20Calculation%20Integration%20with%20text2vec-chinese.md)
 

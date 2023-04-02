@@ -24,10 +24,10 @@ Bibliothecarius是一个本地数据分析工具，可根据自定义prompt进�
   - [x] pdf
   - [x] md
   - [ ] docx
-- [ ] 支持更多的模型
+- [x] 支持更多的模型
   - [x] gpt3.5
-  - [x] 本地化模型
-    - [x] ChatGLM
+  - [x] [本地化模型](doc%2Fzh%2F%E6%9C%AC%E5%9C%B0%E5%8C%96%E6%A8%A1%E5%9E%8B%E6%8E%A5%E5%85%A5%E6%8C%87%E5%8D%97.md)
+    - [x] [ChatGLM](doc%2Fzh%2FChatGLM-6B%E6%8E%A5%E5%85%A5.md)
 - [x] [本地化向量计算](./doc/zh/本地化向量计算接入指南.md)
   - [x]  [text2vec](./doc/zh/本地化向量计算接入text2vec-chinese.md)
   
