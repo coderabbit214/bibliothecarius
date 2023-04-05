@@ -1,0 +1,22 @@
+.editorContainer {
+    position: relative;
+    padding: 4px; /* 添加内边距 */
+}
+
+.editorContainer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    pointer-events: none;
+    box-sizing: border-box; /* 修复边框宽度问题 */
+}
+
+/* 添加边框高亮 */
+.editorContainer:focus-within::after {
+    border-color: #4096ff;
+}
