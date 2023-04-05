@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.4.6",
     "@types/node": "18.15.5",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
@@ -17,13 +18,18 @@
     "eslint-config-next": "13.2.4",
     "http-proxy-middleware": "^2.0.6",
     "lodash": "^4.17.21",
+    "monaco-editor": "^0.36.1",
+    "monaco-editor-webpack-plugin": "^7.0.1",
     "next": "13.2.4",
+    "next-transpile-modules": "^10.0.0",
     "normalize.css": "^8.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-monaco-editor": "^0.52.0",
     "typescript": "5.0.2"
   },
   "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^5.0.0",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/lodash": "^4.14.21",
     "autoprefixer": "^10.4.14",

@@ -5,6 +5,7 @@ import {addScene, updateScene} from "@/services/scene-service";
 import DatasetSelect from "@/components/dataset/dataset-select";
 import {HttpError} from "@/libs/fetch";
 import ModelSelect from "@/components/scene/model-select";
+import JsonEditor from "@/components/json-editor";
 
 interface SceneDrawerProps {
   visible: boolean;
@@ -55,7 +56,7 @@ const SceneDrawer: React.FC<SceneDrawerProps> = ({
       title={scene ? "Modify Scene" : "Create Scene"}
       width={720}
       onClose={onClose}
-      visible={visible}
+      open={visible}
       bodyStyle={{paddingBottom: 80}}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -117,7 +118,7 @@ const SceneDrawer: React.FC<SceneDrawerProps> = ({
             }
           ]}
         >
-          <Input.TextArea rows={4} />
+          <JsonEditor />
         </Form.Item>
 
         <Form.Item>
