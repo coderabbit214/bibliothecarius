@@ -10,8 +10,8 @@ import com.coderabbit214.bibliothecarius.dataset.aliparser.AliParserService;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
 import com.coderabbit214.bibliothecarius.qdrant.point.Point;
 import com.coderabbit214.bibliothecarius.qdrant.point.PointCreateRequest;
-import com.coderabbit214.bibliothecarius.storage.StorageFactory;
-import com.coderabbit214.bibliothecarius.storage.StorageInterface;
+import com.coderabbit214.bibliothecarius.storage.S3Service;
+import com.coderabbit214.bibliothecarius.storage.StorageUtils;
 import com.coderabbit214.bibliothecarius.vector.VectorFactory;
 import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
@@ -54,8 +54,6 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private static final List<String> SUPPORT_FILE_TYPE = List.of(FILE_TYPE_TXT, FILE_TYPE_MD, FILE_TYPE_PDF);
 
-    private final StorageFactory storageFactory;
-
     private final VectorFactory vectorFactory;
 
     private final DatasetService datasetService;
@@ -66,13 +64,15 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
 
     private final AliParserService aliParserService;
 
-    public DocumentService(StorageFactory storageFactory, VectorFactory vectorFactory, @Lazy DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService) {
-        this.storageFactory = storageFactory;
+    private final S3Service s3Service;
+
+    public DocumentService(VectorFactory vectorFactory, @Lazy DatasetService datasetService, @Lazy DocumentService documentService, DocumentQdrantService documentQdrantService, AliParserService aliParserService, S3Service s3Service) {
         this.vectorFactory = vectorFactory;
         this.datasetService = datasetService;
         this.documentService = documentService;
         this.documentQdrantService = documentQdrantService;
         this.aliParserService = aliParserService;
+        this.s3Service = s3Service;
     }
 
     /**
@@ -120,8 +120,8 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                     }
                 }
             } else {
-                StorageInterface ossService = storageFactory.getOssService();
-                fileKey = ossService.uploadFile(file, file.getOriginalFilename());
+                fileKey = StorageUtils.getObjectName(file.getOriginalFilename());
+                s3Service.putObject(StorageUtils.BUCKET_NAME, fileKey, file.getInputStream());
             }
 
             //存储至mysql
@@ -166,8 +166,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
                 documentService.mdToQdrant(fileInputStream, document, vectorType, datasetName);
                 break;
             case FILE_TYPE_PDF:
-                StorageInterface ossService = storageFactory.getOssService();
-                String fileUrl = ossService.getExpiration(document.getFileKey());
+                String fileUrl = s3Service.getObjectURL(StorageUtils.BUCKET_NAME, document.getFileKey(), StorageUtils.DOWNLOAD_EXPIRY_TIME);
                 aliParserService.parse(document, document.getName(), fileUrl, datasetName, vectorType);
                 break;
             default:
@@ -380,8 +379,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
         }
 
         //删除oss
-        StorageInterface ossService = storageFactory.getOssService();
-        ossService.removeObject(document.getFileKey());
+        s3Service.removeObject(StorageUtils.BUCKET_NAME, document.getFileKey());
     }
 
     /**
@@ -413,8 +411,7 @@ public class DocumentService extends ServiceImpl<DocumentMapper, Document> {
         }
         document.setState(DocumentStateEnum.PROCESSING.value());
         this.updateById(document);
-        String fileKey = document.getFileKey();
-        String fileUrl = storageFactory.getOssService().getExpiration(fileKey);
+        String fileUrl = s3Service.getObjectURL(StorageUtils.BUCKET_NAME, document.getFileKey(), StorageUtils.DOWNLOAD_EXPIRY_TIME);
         try {
             URL url = new URL(fileUrl);
             URLConnection urlConnection = url.openConnection();

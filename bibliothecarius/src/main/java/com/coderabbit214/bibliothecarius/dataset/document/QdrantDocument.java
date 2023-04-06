@@ -15,4 +15,5 @@ public class QdrantDocument {
     private Long documentId;
     private String context;
     private String info;
+    private String type = "file";
 }

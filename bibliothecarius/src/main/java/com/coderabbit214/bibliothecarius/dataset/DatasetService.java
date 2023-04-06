@@ -18,8 +18,6 @@ import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.checkerframework.checker.units.qual.A;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
