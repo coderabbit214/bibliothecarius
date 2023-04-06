@@ -20,23 +20,15 @@ qdrant:
 
 
 storage:
-  # 使用storage的模式
-  # 1. ALIYUN
-  # 2. MINIO
-  mode: ALIYUN
-  # 协议
-  protocol: http://
-  # 上传目录
-  dir: /
-  # 上传url过期时间 单位 s
-  updateExpiryTime: 3600
-  # 查看过期时间 单位 s
+  # Cannot start with "/" and must end with "/"，The default value is ""
+  dir: data/
+  # The default value is 3600
   downloadExpiryTime: 3600
-  aliyun:
-    endpoint: xxx
-    keyid: xxx
-    keysecret: xxx
-    bucketName: xxx
+  endpoint: https://oss-cn-beijing.aliyuncs.com
+  keyid: xx
+  keysecret: xx
+  bucket-name: xx
+
 
 ali-parser:
   endpoint: docmind-api.cn-hangzhou.aliyuncs.com
