@@ -3,6 +3,7 @@ import {Drawer, Form, Input, Button, DatePicker, message} from "antd";
 import Dataset from "@/models/dataset";
 import {addDataset, updateDataset} from "@/services/dataset-service";
 import {HttpError} from "@/libs/fetch";
+import VectorSelect from "@/components/dataset/vector-select";
 
 // Define DatasetDrawerProps interface
 interface DatasetDrawerProps {
@@ -72,28 +73,28 @@ const DatasetDrawer: React.FC<DatasetDrawerProps> = ({
           label="Name"
           rules={[{required: true, message: "Please enter a name"}]}
         >
-          <Input placeholder="Please enter a name" disabled={!!dataset} />
+          <Input placeholder="Please enter a name" disabled={!!dataset}/>
         </Form.Item>
         <Form.Item
           name="remark"
           label="Remark"
           rules={[{required: true, message: "Please enter a remark"}]}
         >
-          <Input.TextArea rows={4} placeholder="Please enter a remark" />
+          <Input.TextArea rows={4} placeholder="Please enter a remark"/>
         </Form.Item>
         <Form.Item
           name="vectorType"
           label="Parsing type"
           rules={[{required: true, message: "Please enter a parsing type"}]}
         >
-          <Input placeholder="Please enter a parsing type" />
+          <VectorSelect/>
         </Form.Item>
         <Form.Item
-            name="relevantSize"
-            label="Relevant Size"
-            rules={[{required: true, message: "Please enter a relevant size"}]}
+          name="relevantSize"
+          label="Relevant Size"
+          rules={[{required: true, message: "Please enter a relevant size"}]}
         >
-          <Input placeholder="Please enter a parsing type" />
+          <Input placeholder="Please enter a parsing type"/>
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
