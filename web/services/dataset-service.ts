@@ -1,6 +1,10 @@
 import Dataset from "@/models/dataset";
 import fetch from "@/libs/fetch";
 
+export async function getVectorTypes(): Promise<string[]> {
+  return fetch(`/api/dataset/vector/type`);
+}
+
 export async function getDatasets(): Promise<Dataset[]> {
   return await fetch("/api/dataset/list/");
 }
