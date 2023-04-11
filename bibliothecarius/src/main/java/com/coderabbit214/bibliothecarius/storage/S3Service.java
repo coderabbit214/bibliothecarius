@@ -82,7 +82,7 @@ public class S3Service implements OssService {
         Date date = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, expires);
+        calendar.add(Calendar.SECOND, expires);
         URL url = amazonS3.generatePresignedUrl(bucketName, objectName, calendar.getTime());
         return url.toString();
     }
