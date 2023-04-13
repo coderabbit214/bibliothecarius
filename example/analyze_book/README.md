@@ -4,7 +4,7 @@ Warning: Although the example "Animal Farm" provided by this project has entered
 
 ## 0.Prerequisite
 
-Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob/main/README.mdto launch the project.
+Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob/main/README.md to launch the project.
 
 ## 1.Prepare Data
 
