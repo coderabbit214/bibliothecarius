@@ -14,6 +14,7 @@ curl --location --request POST 'http://127.0.0.1:8080/external/vector' \
 --data-raw '{
     "address": "your address",
     "name": "vector",
+    "size": 768,
     "remark": "Localized Chinese Vector Calculation"
 }'
 ```
