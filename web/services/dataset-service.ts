@@ -4,6 +4,10 @@ import fetch from "@/libs/fetch";
 export async function getVectorTypes(): Promise<string[]> {
   return fetch(`/api/dataset/vector/type`);
 }
+ 
+export async function getDatasetById(id: number): Promise<Dataset> {
+  return await fetch(`/api/dataset/${id}`);
+}
 
 export async function getDatasets(): Promise<Dataset[]> {
   return await fetch("/api/dataset/list/");
@@ -27,4 +31,8 @@ export async function updateDataset(dataset: Dataset): Promise<void> {
       'Content-Type': 'application/json'
     }, body: JSON.stringify(dataset)
   });
+}
+
+export async function getTags(dataset: Dataset): Promise<any> {
+  await fetch(`/api/dataset/${dataset.name}/tags`);
 }

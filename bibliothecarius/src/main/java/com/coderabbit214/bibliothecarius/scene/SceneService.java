@@ -11,9 +11,7 @@ import com.coderabbit214.bibliothecarius.externalModel.ExternalModelService;
 import com.coderabbit214.bibliothecarius.model.ModelFactory;
 import com.coderabbit214.bibliothecarius.model.ModelInterface;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
-import com.coderabbit214.bibliothecarius.qdrant.point.PointSearchParams;
-import com.coderabbit214.bibliothecarius.qdrant.point.PointSearchRequest;
-import com.coderabbit214.bibliothecarius.qdrant.point.PointSearchResponse;
+import com.coderabbit214.bibliothecarius.qdrant.point.*;
 import com.coderabbit214.bibliothecarius.scene.context.ChatContext;
 import com.coderabbit214.bibliothecarius.scene.context.ChatContextService;
 import com.coderabbit214.bibliothecarius.vector.VectorInterface;
@@ -24,9 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>
@@ -134,7 +130,8 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
             chatContextList = chatContextService.listByIdLimit(chatDTO.getContextId(), chatDTO.getHistorySize());
         }
         ChatResult chatResult = new ChatResult();
-        List<Object> jsonData = new ArrayList<>();
+        List<Payload> jsonData = new ArrayList<>();
+        Set<String> tags = new HashSet<>();
 
         List<String> relevantDataList = new ArrayList<>();
 
@@ -148,16 +145,34 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
             pointSearchRequest.setLimit(dataset.getRelevantSize());
             pointSearchRequest.setVector(vector);
             pointSearchRequest.setWithPayload(true);
+            List<FieldCondition> fieldConditions = new ArrayList<>();
+            if (chatDTO.getTags() != null && chatDTO.getTags().size() > 0) {
+                for (String tag : chatDTO.getTags()) {
+                    FieldCondition fieldCondition = new FieldCondition();
+                    fieldCondition.setKey("tags");
+                    MatchValue matchValue = new MatchValue();
+                    matchValue.setValue(tag);
+                    fieldCondition.setMatch(matchValue);
+                    fieldConditions.add(fieldCondition);
+                }
+                Filter filter = new Filter();
+                filter.setShould(fieldConditions);
+                pointSearchRequest.setFilter(filter);
+            }
+
             PointSearchParams params = new PointSearchParams();
             params.setExact(false);
             params.setHnswEf(128);
             pointSearchRequest.setParams(params);
             List<PointSearchResponse> pointSearchResponses = qdrantService.searchPoints(dataset.getName(), pointSearchRequest);
             for (PointSearchResponse pointSearchResponse : pointSearchResponses) {
-                jsonData.add(pointSearchResponse.getPayload());
-                JsonNode jsonNode = JsonUtil.toObject(JsonUtil.toJsonString(pointSearchResponse.getPayload()), JsonNode.class);
-                String content = jsonNode.get("context").asText();
-                relevantDataList.add(content);
+                Object obj = pointSearchResponse.getPayload();
+                Payload payload = JsonUtil.toObject(JsonUtil.toJsonString(obj), Payload.class);
+                jsonData.add(payload);
+                if (payload.getTags() != null) {
+                    tags.addAll(payload.getTags());
+                }
+                relevantDataList.add(payload.getContext());
             }
         }
         chatResult.setJsonData(jsonData);
@@ -185,6 +200,7 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
 
         chatContextService.save(chatContext);
         chatResult.setContextId(chatContext.getId());
+        chatResult.setTags(tags);
         return chatResult;
     }
 
@@ -199,5 +215,16 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
         List<String> modelTypes = new ArrayList<>(ModelInterface.MODEL_TYPES);
         modelTypes.addAll(names);
         return modelTypes;
+    }
+
+    public Set<String> getTags(String name) {
+        Scene scene = this.getByName(name);
+        if (scene == null) {
+            throw new BusinessException("scene does not exist");
+        }
+        if (scene.getDatasetId() == null) {
+            return new HashSet<>();
+        }
+        return datasetService.getTagsById(scene.getDatasetId());
     }
 }

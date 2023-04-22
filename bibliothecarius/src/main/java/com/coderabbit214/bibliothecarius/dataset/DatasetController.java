@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -29,6 +30,13 @@ public class DatasetController {
 
     public DatasetController(DatasetService datasetService) {
         this.datasetService = datasetService;
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "get")
+    public RestResult<?> get(@PathVariable("id") Long id) {
+        Dataset dataset = datasetService.getById(id);
+        return RestResultUtils.success(dataset);
     }
 
 
@@ -65,9 +73,9 @@ public class DatasetController {
     }
 
     @PostMapping("/{name}/json")
-    @Operation(summary = "When uploading json data, the context field is calculated as an index, other fields are not calculated, and type is a reserved field, which is not allowed.")
-    public RestResult<?> uploadJson(@PathVariable("name") String name, @RequestBody JsonNode jsonNode) {
-        datasetService.uploadJson(name, jsonNode);
+    @Operation(summary = "JSON data upload, tags use key-value format, used for downstream chat to filter data.")
+    public RestResult<?> uploadJson(@PathVariable("name") String name, @RequestBody JsonDTO jsonDTO) {
+        datasetService.uploadJson(name, jsonDTO);
         return RestResultUtils.success();
     }
 
@@ -76,6 +84,13 @@ public class DatasetController {
     public RestResult<?> getVectorType() {
         List<String> vectorTypes = datasetService.getVectorType();
         return RestResultUtils.success(vectorTypes);
+    }
+
+    @GetMapping("/{name}/tags")
+    @Operation(summary = "Get optional tags")
+    public RestResult<?> getTags(@PathVariable("name") String name) {
+        Set<String> tags = datasetService.getTags(name);
+        return RestResultUtils.success(tags);
     }
 
 }

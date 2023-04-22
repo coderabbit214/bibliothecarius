@@ -1,10 +1,12 @@
-import {Table, Button, Space, Upload, message, Popconfirm} from 'antd';
+import {Table, Button, Space, Upload, message, Popconfirm, Tag} from 'antd';
 import {DeleteOutlined, EditOutlined, PlusOutlined, SyncOutlined, UploadOutlined} from '@ant-design/icons';
 import React, {useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 import Document from '@/models/document';
 import {getDocuments, uploadDocument, deleteDocument, reprocessDocument} from '@/services/document-service';
 import usePolling from "@/hooks/polling";
+import Dataset from "@/models/dataset";
+import DocumentDrawer from "@/components/document/document-drawer";
 
 const {Column} = Table;
 
@@ -12,6 +14,7 @@ const DocumentPage = () => {
   const router = useRouter();
   const {name: datasetName} = router.query;
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (datasetName) {
@@ -24,16 +27,15 @@ const DocumentPage = () => {
     setDocuments(docs);
   };
 
-  usePolling(fetchDocuments, 5000);
-
-  const handleUpload = async (info: any) => {
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-      fetchDocuments();
-    } else if (info.file.status === 'error') {
-      info.file.error && message.error(info.file.error.message);
-    }
+  const handleCloseDrawer = () => {
+    setDrawerVisible(false);
   };
+
+  const handleAdd = () => {
+    setDrawerVisible(true);
+  };
+
+  usePolling(fetchDocuments, 5000);
 
   const handleDelete = async (id: number) => {
     deleteDocument(datasetName as string, id).then(() =>
@@ -63,32 +65,38 @@ const DocumentPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl mb-4">Document Management - {datasetName}</h1>
       <div className="w-full">
-        <Upload
-          customRequest={({file, onSuccess, onError}) => {
-            uploadDocument(datasetName as string, file as File)
-              .then(() => {
-                onSuccess?.(null);
-              })
-              .catch((err) => {
-                onError?.(err);
-              });
-          }}
-          onChange={handleUpload}
-          showUploadList={false}
+        <Button
+          type="primary"
+          icon={<PlusOutlined/>}
+          className="mb-4"
+          onClick={handleAdd}
         >
-          <Button type="primary" icon={<UploadOutlined />} className="mb-4">Upload Document</Button>
-        </Upload>
+          Add Document
+        </Button>
         <Table dataSource={documents} rowKey="id">
-          <Column title="ID" dataIndex="id" />
-          <Column title="Dataset ID" dataIndex="datasetId" />
-          <Column title="Name" dataIndex="name" />
-          <Column title="Hash Value" dataIndex="hashCode" />
-          <Column title="Status" dataIndex="state" />
-          <Column title="File Key" dataIndex="fileKey" />
-          <Column title="File Size" dataIndex="size" />
-          <Column title="File Type" dataIndex="type" />
-          <Column title="Creation Time" dataIndex="createTime" />
-          <Column title="Update Time" dataIndex="updateTime" />
+          <Column title="ID" dataIndex="id"/>
+          <Column title="Dataset ID" dataIndex="datasetId"/>
+          <Column title="Name" dataIndex="name"/>
+          <Column
+            title="Tags"
+            dataIndex="tags"
+            render={(tags: string[]) => (
+              <>
+                {tags.map((tag) => (
+                  <Tag color="blue" key={tag}>
+                    {tag}
+                  </Tag>
+                ))}
+              </>
+            )}
+          />
+          <Column title="Hash Value" dataIndex="hashCode"/>
+          <Column title="Status" dataIndex="state"/>
+          <Column title="File Key" dataIndex="fileKey"/>
+          <Column title="File Size" dataIndex="size"/>
+          <Column title="File Type" dataIndex="type"/>
+          <Column title="Creation Time" dataIndex="createTime"/>
+          <Column title="Update Time" dataIndex="updateTime"/>
           <Column
             title="Action"
             dataIndex="action"
@@ -96,7 +104,7 @@ const DocumentPage = () => {
               <Space size="middle">
                 <Button
                   type="primary"
-                  icon={<SyncOutlined />}
+                  icon={<SyncOutlined/>}
                   onClick={() => handleReprocess(record.id)}
                 />
                 <Popconfirm
@@ -105,12 +113,13 @@ const DocumentPage = () => {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Button type="primary" icon={<DeleteOutlined />} danger />
+                  <Button type="primary" icon={<DeleteOutlined/>} danger/>
                 </Popconfirm>
               </Space>
             )}
           />
         </Table>
+        <DocumentDrawer visible={drawerVisible} onClose={handleCloseDrawer}/>
       </div>
     </div>
   );

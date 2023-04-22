@@ -6,6 +6,7 @@ export default interface Document {
   state: string;
   fileKey: string;
   size: number;
+  tags: string[];
   type: string;
   createTime: string;
   updateTime: string;

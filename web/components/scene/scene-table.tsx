@@ -129,11 +129,11 @@ const SceneTable: React.FC = () => {
       render: (_: any, record: Scene) => (
         <div className="flex space-x-2">
           <Link href={`/scene/${record.name}/chat`}>
-            <Button type="primary" icon={<MessageOutlined />} />
+            <Button type="primary" icon={<MessageOutlined/>}/>
           </Link>
           <Button
             type="primary"
-            icon={<EditOutlined />}
+            icon={<EditOutlined/>}
             onClick={() => handleEdit(record)}
           />
           <Popconfirm
@@ -142,7 +142,7 @@ const SceneTable: React.FC = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button type="primary" icon={<DeleteOutlined />} danger />
+            <Button type="primary" icon={<DeleteOutlined/>} danger/>
           </Popconfirm>
         </div>
       ),
@@ -153,13 +153,13 @@ const SceneTable: React.FC = () => {
     <div className="w-full">
       <Button
         type="primary"
-        icon={<PlusOutlined />}
+        icon={<PlusOutlined/>}
         className="mb-4"
         onClick={handleAdd}
       >
         Add
       </Button>
-      <Table columns={columns} dataSource={scenes} rowKey="id" />
+      <Table columns={columns} dataSource={scenes} rowKey="id"/>
       <SceneDrawer
         visible={drawerVisible}
         onClose={handleCloseDrawer}

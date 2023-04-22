@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.document;
+package com.coderabbit214.bibliothecarius.document.qdrant;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

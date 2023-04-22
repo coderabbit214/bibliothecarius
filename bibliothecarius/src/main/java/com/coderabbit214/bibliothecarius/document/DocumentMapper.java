@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.document;
+package com.coderabbit214.bibliothecarius.document;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

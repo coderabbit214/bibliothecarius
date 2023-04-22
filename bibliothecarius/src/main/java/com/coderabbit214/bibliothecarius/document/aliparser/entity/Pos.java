@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.aliparser.entity;
+package com.coderabbit214.bibliothecarius.document.aliparser.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

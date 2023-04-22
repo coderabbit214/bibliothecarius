@@ -22,6 +22,8 @@ public class PointSearchRequest {
 
     private int limit;
 
+    private Filter filter;
+
     @JsonProperty("with_payload")
     private Boolean withPayload;
 

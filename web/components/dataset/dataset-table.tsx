@@ -63,6 +63,7 @@ const DatasetTable: React.FC = () => {
 
   const handleCloseDrawer = () => {
     setDrawerVisible(false);
+    fetchDatasets();
   };
 
   const handleDatasetUpdated = () => {

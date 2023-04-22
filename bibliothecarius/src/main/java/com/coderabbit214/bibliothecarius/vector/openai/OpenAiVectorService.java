@@ -55,6 +55,9 @@ public class OpenAiVectorService implements VectorInterface {
         }
 
         for (String t : texts) {
+            if (t.isEmpty()) {
+                continue;
+            }
             EmbeddingRequest embeddingRequest = new EmbeddingRequest();
             embeddingRequest.setInput(t);
             embeddingRequest.setModel(TEXT_EMBEDDING_ADA_002);

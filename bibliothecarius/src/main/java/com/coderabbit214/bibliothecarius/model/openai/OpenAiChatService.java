@@ -47,7 +47,11 @@ public class OpenAiChatService implements ModelInterface {
 
         //前置计算
         List<ChatMessage> messages = chatRequest.getMessages();
-        if (messages != null) {
+        if (messages == null) {
+            messages = new ArrayList<>();
+            chatRequest.setMessages(messages);
+        }
+        if (messages.size() > 0) {
             for (ChatMessage message : messages) {
                 tokens.append(message.getContent());
                 tokens.append("\n");

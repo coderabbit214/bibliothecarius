@@ -40,6 +40,7 @@ Parameters:
 {
     "name": "name (unique and cannot be the same as built-in systems)",
     "remark": "description",
+    "size": "your model size",
     "address": "request address"
 }
 ```

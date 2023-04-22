@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.document;
+package com.coderabbit214.bibliothecarius.document;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,8 +20,8 @@ import java.util.List;
  * @since 2023-03-18
  */
 @RestController
-@RequestMapping("/dataset")
-@Tag(name = "dataset")
+@RequestMapping("/document")
+@Tag(name = "document")
 public class DocumentController {
     private final DocumentService documentService;
 
@@ -29,43 +29,46 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
-    @GetMapping("/document/{id}")
+    @GetMapping("/{id}")
     @Operation(summary = "file get")
     public RestResult<?> get(@PathVariable("id") Long id) {
         Document document = documentService.getById(id);
         return RestResultUtils.success(document);
     }
 
-    @PostMapping("/{name}/document")
+    @PostMapping("/dataset/{name}")
     @Operation(summary = "file upload")
-    public RestResult<?> uploadFile(@PathVariable("name") String name, MultipartFile file) {
-        documentService.uploadFile(name, file);
+    public RestResult<?> uploadFile(@PathVariable("name") String name, MultipartFile[] files, String[] tags) {
+        if (tags == null) {
+            tags = new String[]{};
+        }
+        documentService.uploadFile(name, files, List.of(tags));
         return RestResultUtils.success();
     }
 
-    @PostMapping("/{name}/reprocess/document/{id}")
+    @PostMapping("/dataset/{name}/reprocess/{id}")
     @Operation(summary = "file reprocess")
     public RestResult<?> reprocess(@PathVariable("name") String name, @PathVariable("id") Long id) {
         documentService.reprocess(name, id);
         return RestResultUtils.success();
     }
 
-    @GetMapping("/{name}/document/page")
-    @Operation(summary = "file list")
+    @GetMapping("/dataset/{name}/page")
+    @Operation(summary = "file page")
     public RestResult<?> page(@PathVariable("name") String name, DocumentQuery pageParam) {
         IPage<Document> page = new Page<>(pageParam.getCurrent(), pageParam.getSize());
         page = documentService.pageByQuery(name, pageParam, page);
         return RestResultUtils.success(page);
     }
 
-    @GetMapping("/{name}/document/list")
+    @GetMapping("/dataset/{name}/list")
     @Operation(summary = "file list")
     public RestResult<?> list(@PathVariable("name") String name, DocumentQuery pageParam) {
-        List<Document> documents = documentService.listByQuery(name, pageParam);
+        List<DocumentVO> documents = documentService.listByQuery(name, pageParam);
         return RestResultUtils.success(documents);
     }
 
-    @DeleteMapping("/{name}/document/{id}")
+    @DeleteMapping("/dataset/{name}/{id}")
     @Operation(summary = "file delete")
     public RestResult<?> delete(@PathVariable("id") String id, @PathVariable String name) {
         documentService.delete(id, name);

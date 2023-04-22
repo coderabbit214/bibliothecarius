@@ -3,27 +3,25 @@ package com.coderabbit214.bibliothecarius.dataset;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.coderabbit214.bibliothecarius.common.exception.BusinessException;
-import com.coderabbit214.bibliothecarius.dataset.document.DocumentService;
+import com.coderabbit214.bibliothecarius.common.utils.JsonUtil;
+import com.coderabbit214.bibliothecarius.document.DocumentService;
 import com.coderabbit214.bibliothecarius.externalVector.ExternalVector;
 import com.coderabbit214.bibliothecarius.externalVector.ExternalVectorService;
-import com.coderabbit214.bibliothecarius.model.ModelInterface;
 import com.coderabbit214.bibliothecarius.qdrant.QdrantService;
 import com.coderabbit214.bibliothecarius.qdrant.collection.CollectionRequest;
 import com.coderabbit214.bibliothecarius.qdrant.collection.Vectors;
 import com.coderabbit214.bibliothecarius.qdrant.collection.VectorsDistance;
+import com.coderabbit214.bibliothecarius.qdrant.point.Payload;
+import com.coderabbit214.bibliothecarius.qdrant.point.PayloadTypeEnum;
 import com.coderabbit214.bibliothecarius.qdrant.point.Point;
 import com.coderabbit214.bibliothecarius.qdrant.point.PointCreateRequest;
 import com.coderabbit214.bibliothecarius.vector.VectorFactory;
 import com.coderabbit214.bibliothecarius.vector.VectorInterface;
 import com.coderabbit214.bibliothecarius.vector.VectorResult;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>
@@ -132,23 +130,19 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
      * json数据上传
      *
      * @param name
-     * @param jsonNode
+     * @param jsonDTO
      */
     @Transactional(rollbackFor = Exception.class)
-    public void uploadJson(String name, JsonNode jsonNode) {
+    public void uploadJson(String name, JsonDTO jsonDTO) {
         Dataset dataset = this.getByName(name);
         if (dataset == null) {
             throw new BusinessException("dataset does not exist");
         }
         //检查是否有context字段
-        JsonNode contextJsonNode = jsonNode.get("context");
-        if (contextJsonNode == null) {
+        String context = jsonDTO.getContext();
+        if (context.isEmpty()) {
             throw new BusinessException("The context field cannot be empty");
         }
-        // jsonNode添加type
-        ((ObjectNode) jsonNode).put("type", Dataset.DATA_TYPE_JSON);
-
-        String context = contextJsonNode.toString();
         //openai 计算
         VectorInterface vectorService = vectorFactory.getVectorService(dataset.getVectorType());
         List<VectorResult> vectorResultList = vectorService.getVector(context, dataset.getVectorType());
@@ -156,16 +150,20 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
         List<Point> pointList = new ArrayList<>();
         List<JsonQdrant> jsonQdrantList = new ArrayList<>();
         for (VectorResult vectorResult : vectorResultList) {
+            Payload payload = new Payload();
+            payload.setType(PayloadTypeEnum.JSON.value());
+            payload.setContext(vectorResult.getText());
+            payload.setTags(jsonDTO.getTags());
             Point point = new Point();
             String id = UUID.randomUUID().toString();
             point.setId(id);
             point.setVector(vectorResult.getVector());
-            point.setPayload(jsonNode);
+            point.setPayload(payload);
             pointList.add(point);
             JsonQdrant jsonQdrant = new JsonQdrant();
             jsonQdrant.setDatasetId(dataset.getId());
             jsonQdrant.setQdrantId(id);
-            jsonQdrant.setInfo(jsonNode.toString());
+            jsonQdrant.setInfo(JsonUtil.toJsonString(jsonDTO));
             jsonQdrantList.add(jsonQdrant);
         }
         //添加到qdrant
@@ -189,5 +187,49 @@ public class DatasetService extends ServiceImpl<DatasetMapper, Dataset> {
         List<String> types = new ArrayList<>(VectorInterface.VECTOR_TYPES);
         types.addAll(names);
         return types;
+    }
+
+    public Set<String> getTags(String name) {
+        Dataset dataset = this.getByName(name);
+        if (dataset == null) {
+            throw new BusinessException("dataset does not exist");
+        }
+        Set<String> tags = new HashSet<>();
+        //json
+        LambdaQueryWrapper<JsonQdrant> jsonQdrantLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        jsonQdrantLambdaQueryWrapper.eq(JsonQdrant::getDatasetId, dataset.getId());
+        List<JsonQdrant> jsonQdrantList = jsonQdrantService.list(jsonQdrantLambdaQueryWrapper);
+        jsonQdrantList.forEach(jsonQdrant -> {
+            String info = jsonQdrant.getInfo();
+            JsonDTO jsonDTO = JsonUtil.toObject(info, JsonDTO.class);
+            if (jsonDTO.getTags() != null) {
+                tags.addAll(jsonDTO.getTags());
+            }
+        });
+        //file
+        documentService.listByDatasetId(dataset.getId()).forEach(document -> {
+            tags.addAll(JsonUtil.toArray(document.getTags(), String.class));
+        });
+        return tags;
+    }
+
+    public Set<String> getTagsById(Long id) {
+        Set<String> tags = new HashSet<>();
+        //json
+        LambdaQueryWrapper<JsonQdrant> jsonQdrantLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        jsonQdrantLambdaQueryWrapper.eq(JsonQdrant::getDatasetId, id);
+        List<JsonQdrant> jsonQdrantList = jsonQdrantService.list(jsonQdrantLambdaQueryWrapper);
+        jsonQdrantList.forEach(jsonQdrant -> {
+            String info = jsonQdrant.getInfo();
+            JsonDTO jsonDTO = JsonUtil.toObject(info, JsonDTO.class);
+            if (jsonDTO.getTags() != null) {
+                tags.addAll(jsonDTO.getTags());
+            }
+        });
+        //file
+        documentService.listByDatasetId(id).forEach(document -> {
+            tags.addAll(JsonUtil.toArray(document.getTags(), String.class));
+        });
+        return tags;
     }
 }

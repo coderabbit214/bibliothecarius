@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * @Author: Mr_J
  * @Date: 2023/3/19 12:02
@@ -26,4 +28,6 @@ public class ChatDTO {
      * 用户输入
      */
     private String context;
+
+    private List<String> tags;
 }

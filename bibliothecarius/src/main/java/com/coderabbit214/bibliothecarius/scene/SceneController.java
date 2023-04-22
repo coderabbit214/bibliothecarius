@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -84,8 +85,16 @@ public class SceneController {
     }
 
     @GetMapping("/model/type")
-    @Operation(summary = "获取可选模型类型")
+    @Operation(summary = "Get available model types")
     public RestResult<?> getModelType() {
         return RestResultUtils.success(sceneService.getModelType());
     }
+
+    @GetMapping("/{name}/tags")
+    @Operation(summary = "Get optional tags")
+    public RestResult<?> getTags(@PathVariable("name") String name) {
+        Set<String> tags = sceneService.getTags(name);
+        return RestResultUtils.success(tags);
+    }
+
 }

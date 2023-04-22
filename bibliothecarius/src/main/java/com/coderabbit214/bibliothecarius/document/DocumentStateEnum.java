@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.document;
+package com.coderabbit214.bibliothecarius.document;
 
 public enum DocumentStateEnum {
 

@@ -1,4 +1,4 @@
-package com.coderabbit214.bibliothecarius.dataset.document;
+package com.coderabbit214.bibliothecarius.document;
 
 import com.coderabbit214.bibliothecarius.common.PageParam;
 import lombok.Getter;

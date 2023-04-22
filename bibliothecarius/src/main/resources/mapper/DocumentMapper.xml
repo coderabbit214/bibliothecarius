@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.coderabbit214.bibliothecarius.dataset.document.DocumentMapper">
+<mapper namespace="com.coderabbit214.bibliothecarius.document.DocumentMapper">
 
-    <select id="pageByQuery" resultType="com.coderabbit214.bibliothecarius.dataset.document.Document">
+    <select id="pageByQuery" resultType="com.coderabbit214.bibliothecarius.document.Document">
         select d.id,
         d.dataset_id,
         d.name,
@@ -11,6 +11,7 @@
         d.file_key,
         d.size,
         d.type,
+        d.tags,
         d.create_time,
         d.update_time
         from document d
@@ -23,7 +24,7 @@
         </where>
         order by d.create_time desc
     </select>
-    <select id="listByQuery" resultType="com.coderabbit214.bibliothecarius.dataset.document.Document">
+    <select id="listByQuery" resultType="com.coderabbit214.bibliothecarius.document.Document">
         select d.id,
         d.dataset_id,
         d.name,
@@ -32,6 +33,7 @@
         d.file_key,
         d.size,
         d.type,
+        d.tags,
         d.create_time,
         d.update_time
         from document d

@@ -20,7 +20,9 @@ Follow the instructions at https://github.com/coderabbit214/bibliothecarius/blob
 >
 > remark： Remark
 >
-> parsing type：Vectorization parameter, currently only supports`openaiVector`
+> parsing type: vectorized parameters, built-in `openaiVector`
+> 
+> relevant size: number of relevant data queried
 
 ![0365f05774103bc4518506b8e1790a30](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-210431.jpg?)
 

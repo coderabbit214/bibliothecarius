@@ -1,6 +1,6 @@
 export default interface Scene {
   id: number;
-  name?: string;
+  name: string;
   remark: string;
   template: string;
   datasetId: number;

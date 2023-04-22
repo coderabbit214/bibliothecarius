@@ -20,7 +20,9 @@
 >
 > remark：备注
 >
-> parsing type：向量化参数，目前只支持`openaiVector`
+> parsing type：向量化参数，内置`openaiVector`
+> 
+> relevant size：查询相关数据数量
 
 ![截屏2023-03-26 15.59.12](https://images-jsh.oss-cn-beijing.aliyuncs.com/coderabbit/2023/03/26/20230326-162014.png?)
 
