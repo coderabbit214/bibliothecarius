@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 services:
   qdrant:
     volumes:
@@ -29,6 +29,9 @@ services:
       - '$PWD/bibliothecarius/config:/config'
     ports:
       - '8080:8080'
+    depends_on:
+      - mysql
+      - qdrant
 
   web:
     build: web
@@ -36,3 +39,5 @@ services:
       - '3000:3000'
     environment:
       - NEXT_PUBLIC_API_URL=http://bibliothecarius:8080
+    depends_on:
+      - bibliothecarius
