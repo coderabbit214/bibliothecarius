@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 services:
   qdrant:
     volumes:
@@ -16,9 +16,28 @@ services:
       - $PWD/mysql/data:/var/lib/mysql/
     environment:
       TZ: Asia/Shanghai
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: Str0ngPassw0rd
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+
+  bibliothecarius:
+    build: bibliothecarius
+    volumes:
+      - '$PWD/bibliothecarius/config:/config'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mysql
+      - qdrant
+
+  web:
+    build: web
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=http://bibliothecarius:8080
+    depends_on:
+      - bibliothecarius

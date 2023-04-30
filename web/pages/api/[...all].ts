@@ -15,6 +15,6 @@ export default (req: NextApiRequest, res: NextApiResponse) =>
     req.url = req.url?.replace(/^\/api/, "")
     proxy.once("proxyRes", resolve).once("error", reject).web(req, res, {
       changeOrigin: true,
-      target: 'http://127.0.0.1:8080',
+      target: process.env.NEXT_PUBLIC_API_URL,
     });
   });

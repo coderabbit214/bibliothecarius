@@ -4,18 +4,18 @@ spring:
       max-file-size: 30MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 123456
-    url: jdbc:mysql://xxx:3306/ai_librarian?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    password: Str0ngPassw0rd
+    url: jdbc:mysql://mysql:3306/ai_librarian?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: root
   mvc:
     async:
       request-timeout: 30000
 
 openai:
-  api-key: xxx
+  api-key: YOUR_OPEN_AI_API_KEY
 
 qdrant:
-  host: http://xxx
+  host: http://qdrant:6333
 
 
 
