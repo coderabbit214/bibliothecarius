@@ -194,7 +194,7 @@ public class SceneService extends ServiceImpl<SceneMapper, Scene> {
             chatContext.setId(id);
             chatContext.setSort(1);
         } else {
-            chatContext.setId(chatContextList.get(0).getId());
+            chatContext.setId(chatContextList.get(chatContextList.size()-1).getId());
             chatContext.setSort(chatContextList.size() + 1);
         }
 
