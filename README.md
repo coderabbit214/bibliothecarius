@@ -28,51 +28,73 @@ Bibliothecarius is a local data analysis tool that can engage in conversation ba
   - [ ] docx
 - [x] Support for more models
   - [x] gpt3.5
-  - [x] [Localized model](doc%2Fen%2FLocal%20Model%20Integration%20Guide.md)
-      - [x] [ChatGLM](doc%2Fen%2FChatGLM-6B%20Integration.md)
-- [x] [Localized vector computation](doc%2Fen%2FLocalized%20Vector%20Calculation%20Integration%20Guide.md)
-    - [x]  [text2vec](doc%2Fen%2FLocalized%20Vector%20Calculation%20Integration%20with%20text2vec-chinese.md)
+    - [x] [Localized model](./doc/en/Local Model Integration Guide.md)
+        - [x] [ChatGLM](./doc/en/ChatGLM-6B Integration.md)
+    - [x] [Localized vector computation](./doc/en/Localized Vector Calculation Integration Guide.md)
+        - [x]  [text2vec](./doc/en/Localized Vector Calculation Integration with text2vec-chinese.md)
 
 
 ## Quick Start
 
 ### Environment Setup
 
-#### Use our prepared`docker-compose.yaml`
+#### Use the provided `docker-compose.yaml`
 
-After downloading the code, initialize the environment with docker-compose:
+Before starting the stack, copy the template config file and then update it with your own settings:
 
 ```bash
-docker-compose up -d
+cp ./bibliothecarius/config/application.example.yaml ./bibliothecarius/config/application.yaml
 ```
+
+At minimum, review and update these fields in `./bibliothecarius/config/application.yaml`:
+
+- MySQL configuration
+- OpenAI key
+- Qdrant service address
+- Storage configuration
+
+After the config file is ready, start the stack from the repository root:
+
+```bash
+docker compose up -d
+```
+
+> `docker-compose.yaml` now expects `./bibliothecarius/config/application.yaml` to exist. If you skip the `cp` step above, Compose will fail fast instead of silently creating an empty path.
+
 #### Build the environment on your own
 - MySQL
-  - Use an existing database: initialization SQL is available in ./mysql/init/init.sql, simply execute it.
+  - Use an existing database: initialization SQL is available in `./mysql/init/init.sql`, simply execute it.
 - Qdrant
   - Refer to [official installation](https://qdrant.tech/documentation/quick_start/)
 
 
 ### Run the Service
 
-1. Modify the configuration file `./bibliothecarius/config/application.yaml`, including:
-
-   - MySQL configuration
-   - opanai key
-   - Qdrant service address
-   - Storage configuration
-
-2. Start the backend service with docker-compose
+1. If you have not created the config file yet, copy it first:
 
    ```bash
-   cd bibliothecarius
-   docker-compose up -d
+   cp ./bibliothecarius/config/application.example.yaml ./bibliothecarius/config/application.yaml
    ```
 
-3. Verify the backend service by visiting http://127.0.0.1:8080/
+2. Edit `./bibliothecarius/config/application.yaml`.
 
-4. If you want to embed in your service, you can leave the front-end service unenabled
+3. Start the full stack:
 
-   Front-end project`./web`
+   ```bash
+   docker compose up -d
+   ```
+
+   If you only want the backend-related services, you can run:
+
+   ```bash
+   docker compose up -d mysql qdrant bibliothecarius
+   ```
+
+4. Verify the backend service by visiting http://127.0.0.1:8080/
+
+5. If you want to embed Bibliothecarius into your own service, you can leave the front-end service disabled.
+
+   Front-end project: `./web`
 
 [Interface document](https://www.apifox.cn/apidoc/shared-0dfab7c9-3d3f-498a-b4c2-88b5e6b99a01)
 

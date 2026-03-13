@@ -1,15 +1,17 @@
-FROM openjdk:17-jdk
+FROM eclipse-temurin:17-jdk-jammy AS builder
 LABEL maintainer=bibliothecarius
 
-COPY . /code
+WORKDIR /workspace
+COPY . .
 
-WORKDIR /code
+RUN chmod +x ./gradlew \
+	&& ./gradlew --no-daemon bootJar
 
-RUN microdnf install findutils
+FROM eclipse-temurin:17-jre-jammy
 
-RUN ./gradlew bootJar
-RUN mv ./build/libs/bibliothecarius-0.0.1-SNAPSHOT.jar /app.jar
+WORKDIR /app
+COPY --from=builder /workspace/build/libs/*.jar /app/app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh","-c","java -jar /app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
