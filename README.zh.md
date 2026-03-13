@@ -26,8 +26,8 @@ Bibliothecarius是一个本地数据分析工具，可根据自定义prompt进�
   - [ ] docx
 - [x] 支持更多的模型
   - [x] gpt3.5
-  - [x] [本地化模型](doc%2Fzh%2F%E6%9C%AC%E5%9C%B0%E5%8C%96%E6%A8%A1%E5%9E%8B%E6%8E%A5%E5%85%A5%E6%8C%87%E5%8D%97.md)
-    - [x] [ChatGLM](doc%2Fzh%2FChatGLM-6B%E6%8E%A5%E5%85%A5.md)
+    - [x] [本地化模型](./doc/zh/本地化模型接入指南.md)
+        - [x] [ChatGLM](./doc/zh/ChatGLM-6B接入.md)
 - [x] [本地化向量计算](./doc/zh/本地化向量计算接入指南.md)
   - [x]  [text2vec](./doc/zh/本地化向量计算接入text2vec-chinese.md)
   
@@ -36,13 +36,29 @@ Bibliothecarius是一个本地数据分析工具，可根据自定义prompt进�
 
 ### 环境准备
 
-#### 使用我们为你准备好的`docker-compose.yaml`
+#### 使用我们为你准备好的 `docker-compose.yaml`
 
-下载代码后docker-compose初始化环境
+启动前请先复制一份配置模板，并按需修改：
 
 ```bash
-docker-compose up -d
+cp ./bibliothecarius/config/application.example.yaml ./bibliothecarius/config/application.yaml
 ```
+
+至少需要检查并修改 `./bibliothecarius/config/application.yaml` 中的以下配置：
+
+- MySQL 配置
+- OpenAI key
+- Qdrant 服务地址
+- 存储配置
+
+配置文件准备完成后，在仓库根目录执行：
+
+```bash
+docker compose up -d
+```
+
+> 当前 `docker-compose.yaml` 会直接挂载 `./bibliothecarius/config/application.yaml`。如果没有先执行上面的 `cp`，Compose 会直接报错，避免误创建空目录。
+
 #### 自己构建环境
 - MySQL
   - 使用已有的数据库：`./mysql/init/init.sql`中有初始化sql，执行即可。 
@@ -52,27 +68,33 @@ docker-compose up -d
 
 ### 运行服务
 
-1. 修改`./bibliothecarius/config/application.yaml`配置文件，包括：
-
-   - MySQL配置
-   - opanai key
-   - Qdrant 服务地址
-   - 存储配置
-
-2. docker-compose启动后端服务
+1. 如果还没有配置文件，请先复制一份：
 
    ```bash
-   cd bibliothecarius
-   docker-compose up -d
+   cp ./bibliothecarius/config/application.example.yaml ./bibliothecarius/config/application.yaml
    ```
 
-3. 验证后端服务
+2. 修改 `./bibliothecarius/config/application.yaml` 配置。
+
+3. 启动整套服务：
+
+   ```bash
+   docker compose up -d
+   ```
+
+   如果你只想启动后端相关服务，可以执行：
+
+   ```bash
+   docker compose up -d mysql qdrant bibliothecarius
+   ```
+
+4. 验证后端服务
 
    进入http://127.0.0.1:8080/
 
-4. 如果您要嵌入到您的服务中，可以不启用前端服务。
+5. 如果您要嵌入到自己的服务中，可以不启用前端服务。
 
-   前端项目`./web`
+   前端项目：`./web`
 
    
 
